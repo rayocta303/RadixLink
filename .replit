@@ -1,2 +1,60 @@
+modules = ["php-8.4"]
 [agent]
 expertMode = true
+
+[userenv]
+
+[userenv.shared]
+APP_NAME = "ISP Manager SaaS"
+APP_ENV = "local"
+APP_DEBUG = "true"
+APP_URL = "http://0.0.0.0:5000"
+APP_LOCALE = "id"
+APP_FALLBACK_LOCALE = "en"
+DB_CONNECTION = "mysql"
+DB_HOST = "195.88.211.243"
+DB_PORT = "3306"
+DB_DATABASE = "berkahcu_myisp"
+DB_USERNAME = "berkahcu_myisp"
+DB_PASSWORD = "berkahcu_myisp"
+SESSION_DRIVER = "file"
+CACHE_STORE = "file"
+QUEUE_CONNECTION = "sync"
+TENANT_MODE = "cpanel"
+CPANEL_HOST = "berkahcuy.my.id"
+CPANEL_PORT = "2083"
+CPANEL_USERNAME = "berkahcu"
+CPANEL_PASSWORD = "Hanifbagus303."
+APP_KEY = "base64:lvgUAzZml7EhrIwvh4V/NtqvE4M5Y2sWZ5gQkJ+MLpI="
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Laravel Server"
+
+[[workflows.workflow]]
+name = "Laravel Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "php artisan serve --host=0.0.0.0 --port=5000"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 35385
+externalPort = 3000
