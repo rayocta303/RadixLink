@@ -23,6 +23,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         'custom_domain',
         'subscription_plan',
         'subscription_expires_at',
+        'trial_ends_at',
         'is_active',
         'is_suspended',
         'suspend_reason',
@@ -38,6 +39,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         'is_active' => 'boolean',
         'is_suspended' => 'boolean',
         'subscription_expires_at' => 'datetime',
+        'trial_ends_at' => 'datetime',
         'settings' => 'array',
         'data' => 'array',
     ];
