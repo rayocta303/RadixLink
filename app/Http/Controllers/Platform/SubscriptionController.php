@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Platform;
 use App\Http\Controllers\Controller;
 use App\Models\SubscriptionPlan;
 use App\Models\TenantSubscription;
+use App\Models\Tenant;
 use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
@@ -13,7 +14,8 @@ class SubscriptionController extends Controller
     {
         $plans = SubscriptionPlan::orderBy('sort_order')->get();
         $subscriptions = TenantSubscription::with(['tenant', 'plan'])->latest()->paginate(15);
-        return view('platform.subscriptions.index', compact('plans', 'subscriptions'));
+        $tenants = Tenant::orderBy('created_at', 'desc')->get();
+        return view('platform.subscriptions.index', compact('plans', 'subscriptions', 'tenants'));
     }
 
     public function create()
