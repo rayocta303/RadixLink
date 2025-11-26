@@ -7,7 +7,9 @@
     <title>@yield('title', 'Dashboard') - {{ config('app.name') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.tailwindcss.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -30,6 +32,27 @@
     </script>
     <style>
         [x-cloak] { display: none !important; }
+        
+        .dataTables_wrapper { @apply text-sm; }
+        .dataTables_wrapper .dataTables_length select { @apply rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm py-1 px-2 mr-2; }
+        .dataTables_wrapper .dataTables_filter input { @apply rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm py-2 px-3 ml-2; }
+        .dataTables_wrapper .dataTables_info { @apply text-gray-600 dark:text-gray-400 py-4; }
+        .dataTables_wrapper .dataTables_paginate { @apply py-4; }
+        .dataTables_wrapper .dataTables_paginate .paginate_button { @apply px-3 py-1 mx-0.5 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer; }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current { @apply bg-primary-600 text-white hover:bg-primary-700; }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled { @apply text-gray-400 dark:text-gray-600 cursor-not-allowed hover:bg-transparent; }
+        
+        table.dataTable { @apply w-full border-collapse; }
+        table.dataTable thead th { @apply px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700; }
+        table.dataTable tbody td { @apply px-4 py-3 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-100 dark:border-gray-700; }
+        table.dataTable tbody tr { @apply bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors; }
+        table.dataTable tbody tr.odd { @apply bg-gray-50/50 dark:bg-gray-800/80; }
+        table.dataTable.no-footer { @apply border-b-0; }
+        
+        .dt-buttons { @apply mb-4 flex gap-2; }
+        .dt-buttons .dt-button { @apply px-3 py-2 text-sm rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors; }
+        
+        .dataTables_empty { @apply text-center text-gray-500 dark:text-gray-400 py-8; }
     </style>
     @stack('styles')
 </head>
@@ -82,6 +105,42 @@
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script>
+        $.extend(true, $.fn.dataTable.defaults, {
+            responsive: true,
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                infoEmpty: "Tidak ada data",
+                infoFiltered: "(difilter dari _MAX_ total data)",
+                zeroRecords: "Tidak ada data yang cocok",
+                emptyTable: "Tidak ada data tersedia",
+                paginate: {
+                    first: "Awal",
+                    previous: "Sebelumnya",
+                    next: "Selanjutnya",
+                    last: "Akhir"
+                }
+            },
+            dom: '<"flex flex-wrap items-center justify-between gap-4 mb-4"<"flex items-center gap-2"l><"flex items-center gap-2"Bf>>rtip',
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Semua"]],
+            buttons: [
+                { extend: 'copy', text: 'Copy', className: 'dt-button' },
+                { extend: 'excel', text: 'Excel', className: 'dt-button' },
+                { extend: 'pdf', text: 'PDF', className: 'dt-button' },
+                { extend: 'print', text: 'Print', className: 'dt-button' }
+            ]
+        });
+    </script>
     @stack('scripts')
 </body>
 </html>
