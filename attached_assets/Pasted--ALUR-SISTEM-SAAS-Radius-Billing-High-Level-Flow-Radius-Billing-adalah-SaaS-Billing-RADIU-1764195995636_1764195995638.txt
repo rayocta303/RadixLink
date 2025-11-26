@@ -1,0 +1,298 @@
+# ALUR SISTEM SAAS -- Radius Billing (High-Level Flow)
+
+Radius Billing adalah SaaS Billing + RADIUS Management untuk
+ISP/MikroTik/Hotspot dengan model multi-tenant (reseller / kemitraan) di
+mana setiap bisnis punya akun terpisah.
+
+## 1. Registrasi & Pembentukan Tenant
+
+### User daftar → menjadi "Tenant" baru
+
+**Proses:**
+
+- User daftar via form (nama bisnis, domain/subdomain, email).
+- Sistem buat tenant baru:
+  - Auto-create schema/tabel khusus tenant (`tenant1.users`,
+    `tenant1.orders`, `tenant1.radius_users`, dll)
+  - Auto-provision domain/subdomain seperti `myisp.platform.com` atau
+    custom domain (CNAME → platform)
+- Generate role default:
+  - Owner
+  - Admin
+  - Teknisi
+  - Kasir
+  - Investor
+  - Support
+  - Customer
+
+Tenant = satu "bisnis ISP".
+
+## 2. Konfigurasi Awal Tenant
+
+Tenant login → diarahkan ke onboarding:
+
+- Masukkan NAS (Router MikroTik / UniFi / OpenWRT)
+
+  - IP NAS
+  - Secret
+  - Port RADIUS
+  - Jenis NAS
+
+- Sistem daftarkan NAS ke server RADIUS (Auto-API/CLI)
+- Tenant mendapat dashboard kosong untuk mulai jualan voucher / paket.
+
+## 3. Membuat Paket Layanan
+
+Tenant membuat paket:
+
+- Hotspot Voucher
+- PPPoE
+- Hybrid
+
+**Limitasi:** - Bandwidth up/down
+
+- Durasi (1h, 1d, 30d)
+- Kuota (jika digunakan)
+- ISOLIR
+- FUP
+- Expiration
+
+Disimpan ke tabel tenant:
+
+```
+    services
+    pricing
+    radius_profiles
+```
+
+## 4. Penjualan Voucher / Layanan
+
+### A. Voucher Manual
+
+- Admin klik "Generate Voucher"
+- Sistem buat username/password unik
+- Push ke tabel radius (radcheck, radreply)
+
+### B. E-Commerce (Landing Page Otomatis)
+
+Tenant dapat otomatis:
+
+- Halaman pembelian publik
+- Pembayaran (Midtrans/Tripay)
+- Auto-activate setelah pembayaran sukses
+
+**Flow Pembelian:** Customer pilih paket → Checkout → Bayar → Settlement
+→ Radius user dibuat → Internet aktif
+
+## 5. Integrasi RADIUS
+
+Router → Auth-request → Server RADIUS → Validasi:
+
+- Masa aktif
+- Status user
+- Limit bandwidth
+- MAC binding
+- Expiry
+
+Jika valid → **Access-Accept**
+Jika tidak → **Access-Reject**
+
+**Logging:** - Auth Log
+
+- Accounting Log
+- Disconnect (CoA)
+
+## 6. Monitoring Real-Time
+
+Dashboard tenant menampilkan:
+
+- User online
+- Traffic live
+- Session accounting
+- Device dashboard
+- Status NAS
+
+Flow: NAS → RADIUS → DB → WebSocket → Dashboard tenant
+
+## 7. Billing & Keuangan
+
+- Invoice bulanan (untuk biaya SaaS)
+- Income penjualan voucher
+- Payment gateway (Midtrans/Tripay)
+- Auto-suspend jika tidak bayar
+
+Tabel:
+
+```
+    invoices
+    payments
+    subscription
+```
+
+## 8. Role Management Tenant
+
+| Role             | Fungsi                                     |
+| ---------------- | ------------------------------------------ |
+| **Owner Tenant** | Full control: billing, domain, paket, user |
+| **Admin Tenant** | Kelola paket, voucher, radius user         |
+| **Teknisi**      | Monitoring, log, manage NAS                |
+| **Kasir**        | Cetak voucher, transaksi offline           |
+| **Support**      | Reset akun user, cek masa aktif            |
+| **Investor**     | Lihat laporan keuangan                     |
+| **Client**       | End-user untuk hotspot/PPPoE               |
+
+## 9. Multi-Tenant Isolation
+
+Setiap tenant punya:
+
+- DB/schema sendiri
+- Domain / subdomain sendiri
+- RADIUS namespace sendiri (database per tenant)
+
+Contoh:
+
+    radius_tenant1.radcheck
+    radius_tenant2.radcheck
+    radius_tenant3.radcheck
+
+Keuntungan: - Data aman - Tidak tabrakan - Backup/restore per tenant
+
+## 10. Auto-Scaling & Worker Jobs
+
+- Generate voucher massal
+- Expire user
+- CoA (disconnect otomatis)
+- Pindah paket otomatis
+- Delete session stuck
+- Backup tenant
+
+## 11. Support Multi-NAS
+
+Flow: Tenant input NAS → RADIUS register → Router arahkan ke server →
+Auth masuk ke tenant masing-masing
+
+## 12. SaaS Layer (Platform Administrator)
+
+Super Admin dapat melihat:
+
+- Semua tenant
+- Billing SaaS
+- Logs
+- Resource usage
+- Suspend tenant
+- Custom domain
+
+---
+
+SaaS Layer (Platform Administrator)
+
+| Role                    | Hak Akses                                           |
+| ----------------------- | --------------------------------------------------- |
+| **Super Admin**         | Full access seluruh platform: tenant, billing, logs |
+| **Platform Admin**      | Approve tenant, reset akses, pengaturan global      |
+| **Platform Cashier**    | Atur billing antar-tenant, subscription             |
+| **Platform Technician** | Monitoring cluster RADIUS, server, debug global     |
+| **Platform Support**    | Ticketing, support tenant, reset login tenant       |
+
+Role Tenant (Level Dalam Tenant)
+| Role | Level | Hak Akses Utama | Catatan |
+| --------------------- | ------ | --------------------- | --------------------- |
+| **Owner Tenant** | Tenant | Full access | Pemilik ISP |
+| **Admin** | Tenant | Operasional penuh | Manage user/NAS/paket |
+| **Technician** | Tenant | Teknis jaringan | Debug, monitoring |
+| **Cashier** | Tenant | Transaksi | Penjualan, invoice |
+| **Support** | Tenant | Bantuan teknis ringan | Reset akun |
+| **Reseller** | Tenant | Sub-tenant | Kelola client sendiri |
+| **Investor** | Tenant | View-only | Laporan |
+| **Client / End-User** | Publik | Lihat akun | User hotspot/PPPoE |
+
+---
+
+```
+Platform Level:
+    ▶ Super Admin
+        ├── Platform Admin
+        ├── Platform Cashier
+        ├── Platform Technician
+        └── Platform Support
+
+Tenant Level:
+    ▶ Owner / Admin Tenant
+        ├── Admin
+        ├── Technician
+        ├── Cashier
+        ├── Support
+        ├── Reseller
+        └── Investor
+
+External:
+    ▶ Client / End-User
+```
+
+Teknologi Yang dipakai :
+Laravel 12
+Tailwind CSS (via CDN)
+Skema Warna tema bisa di custom menggunakan theme.json
+Datatables (https://datatables.net/)
+Multi Tenant hybrid (bisa set pada env):
+cPanel UAPI (jika host menggunakan shared hosting)
+Tenancy Laravel (jika menggunakan dedicated server / vps)
+
+Database Mysql untuk database central appsnya :
+HOST : 195.88.211.243
+USERNAME : berkahcu_myisp
+PASSWORD : berkahcu_myisp
+DB NAME : berkahcu_myisp
+
+cPanel Login :
+Host : berkahcuy.my.id:2083
+Username : berkahcu
+Password : Hanifbagus303.
+
+Referensi PHP Mikrotik Billing + Freeradius :
+Gunakan fungsi dari Source PHPNuxBill modifikasi agar menjadi saas
+https://github.com/hotspotbilling/phpnuxbill.git
+
+Referensi SAAS :
+https://rlradius.id/
+
+| Nama Layanan / Platform         | Keterangan / Fitur Utama                                                                                                                                                                      |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **MSRadius**                    | Sistem billing + RADIUS + hotspot/PPPoE. Menyediakan data terpusat, manajemen voucher, integrasi billing/payment, multi-NAS, multi-router, database terpisah per pelanggan. ([MSRadius][1])   |
+| **RadbooX**                     | Layanan Radius + billing dan manajemen pengguna untuk MikroTik / hotspot / PPPoE. Integrasi billing, user management, voucher, Hotspot/PPPoE. ([RadbooX][2])                                  |
+| **MixRadius** (cloud-MixRadius) | Sistem cloud billing + RADIUS untuk mini-ISP / hotspot / komunitas, basis FreeRADIUS, cocok untuk pengguna yang ingin solusi cepat tanpa setup server sendiri. ([Cloud Mixradius][3])         |
+| **GalaxyRAD**                   | Platform billing & RADIUS untuk hotspot / PPPoE / ISP, mendukung integrasi router MikroTik, voucher, billing otomatis, dan bisa dijalankan sebagai SaaS/ cloud / on-premise. ([GalaxyRad][4]) |
+| **SmartISP ERP CRM Radius**     | Solusi billing, manajemen pelanggan, AAA (RADIUS), integrasi NAS multi-vendor, billing/invoice, portal pelanggan — cocok untuk ISP/WISP menengah ke atas. ([SmartISP ERP CRM][5])             |
+
+[1]: https://msradius.com/?utm_source=chatgpt.com "MSRadius"
+[2]: https://www.radboox.com/?utm_source=chatgpt.com "RadbooX - Radius And Billing Solutions"
+[3]: https://mixradius.com/product/cloud-mixradius/?utm_source=chatgpt.com "Cloud Mixradius — Billing Radius Rtrwnet & Mini ISP ( Hotspot + PPPoE ) Murah Fitur Lengkap"
+[4]: https://www.galaxyrad.com/?utm_source=chatgpt.com "Home - GalaxyRAD"
+[5]: https://smartisp.net/?utm_source=chatgpt.com "Home - SmartISP ERP CRM"
+
+
+Fitur RL Radius:
+
+Platform subscription tiers dengan 7 paket (Basic to Platinum) dan limitasi router/langganan/voucher/user online
+Multi-tenant registration dengan auto-provisioning subdomain dan custom domain support
+Cloud Manager dashboard untuk Super Admin kelola semua tenant, billing SaaS, dan resource usage
+Role-based access: Platform level (Super Admin, Platform Admin, Cashier, Technician, Support) dan Tenant level (Owner, Admin, Technician, Cashier, Support, Reseller, Investor, Client)
+Tenant onboarding untuk konfigurasi NAS (MikroTik/UniFi) dengan IP, secret, port, dan auto-generate script koneksi
+Service package builder (Hotspot/PPPoE/DHCP/Hybrid) dengan bandwidth, duration, quota, FUP, isolir settings
+Manual voucher generator dengan template selection dan bulk generation
+Public landing page per tenant untuk package purchase dengan custom branding
+Payment gateway integration (Midtrans/Tripay) dengan QRIS, e-wallet, VA, minimarket, dan auto-activation
+Auto-billing system untuk tagihan prabayar, pascabayar, recurring, one-time, dan addons
+Invoice generator (auto & manual) dengan PDF export untuk PPPoE dan Hotspot members
+RADIUS user management dengan radcheck/radreply tables dan tenant isolation
+Real-time dashboard dengan online users, traffic stats, session accounting, dan NAS status indicators
+Sistem Kemitraan (Reseller) - Mitra kelola pelanggan sendiri dengan topup saldo otomatis
+Ticketing system dengan status tracking dan progress updates
+Google Maps integration untuk pelanggan location marking dengan online/offline status
+Voucher template gallery dengan customizable designs (logo, QR code, styling)
+Excel export/import untuk data migration dan backup
+Laporan transaksi lengkap: penjualan, komisi mitra, pemasukan, pengeluaran
+Tenant resource monitoring dan usage tracking terhadap limitasi paket
+Custom theme support via theme.json dengan Tailwind CSS configuration
+DataTables integration untuk semua data management interfaces
+Responsive UI dengan dark mode support
