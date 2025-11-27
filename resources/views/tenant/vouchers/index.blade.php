@@ -38,7 +38,7 @@
                 <div class="ml-5 w-0 flex-1">
                     <dl>
                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Voucher</dt>
-                        <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $vouchers->count() ?? 0 }}</dd>
+                        <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $stats['total'] ?? 0 }}</dd>
                     </dl>
                 </div>
             </div>
@@ -57,7 +57,7 @@
                 <div class="ml-5 w-0 flex-1">
                     <dl>
                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Tersedia</dt>
-                        <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $vouchers->where('status', 'available')->count() ?? 0 }}</dd>
+                        <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $stats['unused'] ?? 0 }}</dd>
                     </dl>
                 </div>
             </div>
@@ -76,7 +76,7 @@
                 <div class="ml-5 w-0 flex-1">
                     <dl>
                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Digunakan</dt>
-                        <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $vouchers->where('status', 'used')->count() ?? 0 }}</dd>
+                        <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $stats['used'] ?? 0 }}</dd>
                     </dl>
                 </div>
             </div>
@@ -95,7 +95,7 @@
                 <div class="ml-5 w-0 flex-1">
                     <dl>
                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Expired</dt>
-                        <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $vouchers->where('status', 'expired')->count() ?? 0 }}</dd>
+                        <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $stats['expired'] ?? 0 }}</dd>
                     </dl>
                 </div>
             </div>
@@ -124,22 +124,24 @@
                         <span class="font-mono text-sm font-medium text-gray-900 dark:text-white">{{ $voucher->code }}</span>
                     </td>
                     <td>{{ $voucher->servicePlan->name ?? '-' }}</td>
-                    <td>{{ $voucher->duration ?? '-' }} {{ $voucher->duration_unit ?? '' }}</td>
+                    <td>{{ $voucher->servicePlan->validity_text ?? '-' }}</td>
                     <td>
                         <span class="font-semibold text-gray-900 dark:text-white">Rp {{ number_format($voucher->price ?? 0, 0, ',', '.') }}</span>
                     </td>
                     <td>
                         @php
                             $statusColors = [
-                                'available' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+                                'unused' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
                                 'used' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
                                 'expired' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+                                'disabled' => 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
                             ];
-                            $statusColor = $statusColors[$voucher->status] ?? $statusColors['available'];
+                            $statusColor = $statusColors[$voucher->status] ?? $statusColors['unused'];
                             $statusLabels = [
-                                'available' => 'Tersedia',
+                                'unused' => 'Tersedia',
                                 'used' => 'Digunakan',
                                 'expired' => 'Expired',
+                                'disabled' => 'Nonaktif',
                             ];
                         @endphp
                         <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $statusColor }}">
@@ -154,7 +156,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
                                 </svg>
                             </button>
-                            @if($voucher->status === 'available')
+                            @if($voucher->status === 'unused')
                             <form action="{{ route('tenant.vouchers.destroy', $voucher) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus voucher ini?')">
                                 @csrf
                                 @method('DELETE')

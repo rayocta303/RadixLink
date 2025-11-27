@@ -16,12 +16,21 @@ class VoucherController extends Controller
         if (!TenantDatabaseManager::isConnected()) {
             return view('tenant.vouchers.index', [
                 'vouchers' => collect(),
+                'stats' => ['total' => 0, 'unused' => 0, 'used' => 0, 'expired' => 0],
                 'dbError' => 'Database tenant belum dikonfigurasi.',
             ]);
         }
 
         $vouchers = Voucher::with('servicePlan')->orderBy('created_at', 'desc')->paginate(20);
-        return view('tenant.vouchers.index', compact('vouchers'));
+        
+        $stats = [
+            'total' => Voucher::count(),
+            'unused' => Voucher::where('status', 'unused')->count(),
+            'used' => Voucher::where('status', 'used')->count(),
+            'expired' => Voucher::where('status', 'expired')->count(),
+        ];
+        
+        return view('tenant.vouchers.index', compact('vouchers', 'stats'));
     }
 
     public function create()

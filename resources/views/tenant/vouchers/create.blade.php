@@ -11,9 +11,12 @@
                 @csrf
                 <div class="space-y-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Service Plan</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Paket Layanan</label>
                         <select name="service_plan_id" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm px-3 py-2">
-                            <option value="">Select a plan</option>
+                            <option value="">Pilih Paket</option>
+                            @foreach($servicePlans ?? [] as $plan)
+                            <option value="{{ $plan->id }}">{{ $plan->name }} - Rp {{ number_format($plan->price ?? 0, 0, ',', '.') }} ({{ $plan->validity_text ?? '-' }})</option>
+                            @endforeach
                         </select>
                     </div>
                     <div>
