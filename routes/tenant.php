@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+use App\Http\Controllers\Tenant\VoucherController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,5 +26,12 @@ Route::middleware([
 ])->group(function () {
     Route::get('/', function () {
         return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
+    });
+    
+    // Voucher routes
+    Route::prefix('tenant/vouchers')->name('tenant.vouchers.')->group(function () {
+        Route::get('/print-selected', [VoucherController::class, 'printSelected'])->name('print-selected');
+        Route::get('/print/{batch}', [VoucherController::class, 'print'])->name('print');
+        Route::post('/bulk-delete', [VoucherController::class, 'bulkDelete'])->name('bulk-delete');
     });
 });
