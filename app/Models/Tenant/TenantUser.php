@@ -4,14 +4,14 @@ namespace App\Models\Tenant;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Facades\DB;
 
 class TenantUser extends Authenticatable
 {
     protected $connection = 'tenant';
     protected $table = 'users';
     
-    use Notifiable, HasRoles;
+    use Notifiable;
 
     protected $fillable = [
         'name',
@@ -19,6 +19,7 @@ class TenantUser extends Authenticatable
         'phone',
         'password',
         'avatar',
+        'role',
         'is_active',
         'last_login_at',
         'last_login_ip',
@@ -35,6 +36,102 @@ class TenantUser extends Authenticatable
         'is_active' => 'boolean',
         'password' => 'hashed',
     ];
+
+    public function roles()
+    {
+        return $this->belongsToMany(
+            TenantRole::class,
+            'model_has_roles',
+            'model_id',
+            'role_id'
+        )->where('model_type', self::class);
+    }
+
+    public function permissions()
+    {
+        return $this->belongsToMany(
+            TenantPermission::class,
+            'model_has_permissions',
+            'model_id',
+            'permission_id'
+        )->where('model_type', self::class);
+    }
+
+    public function hasRole(string|array $roles): bool
+    {
+        if (is_string($roles)) {
+            return $this->roles()->where('name', $roles)->exists();
+        }
+        
+        return $this->roles()->whereIn('name', $roles)->exists();
+    }
+
+    public function hasAnyRole(array $roles): bool
+    {
+        return $this->roles()->whereIn('name', $roles)->exists();
+    }
+
+    public function hasPermissionTo(string $permission): bool
+    {
+        if ($this->permissions()->where('name', $permission)->exists()) {
+            return true;
+        }
+        
+        $roleIds = $this->roles()->pluck('id');
+        return DB::connection('tenant')
+            ->table('role_has_permissions')
+            ->join('permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
+            ->whereIn('role_has_permissions.role_id', $roleIds)
+            ->where('permissions.name', $permission)
+            ->exists();
+    }
+
+    public function assignRole(string|array $roles): self
+    {
+        $roleNames = is_array($roles) ? $roles : [$roles];
+        
+        foreach ($roleNames as $roleName) {
+            $role = TenantRole::where('name', $roleName)->first();
+            if ($role && !$this->hasRole($roleName)) {
+                DB::connection('tenant')->table('model_has_roles')->insert([
+                    'role_id' => $role->id,
+                    'model_type' => self::class,
+                    'model_id' => $this->id,
+                ]);
+            }
+        }
+        
+        return $this;
+    }
+
+    public function removeRole(string $roleName): self
+    {
+        $role = TenantRole::where('name', $roleName)->first();
+        if ($role) {
+            DB::connection('tenant')->table('model_has_roles')
+                ->where('role_id', $role->id)
+                ->where('model_type', self::class)
+                ->where('model_id', $this->id)
+                ->delete();
+        }
+        
+        return $this;
+    }
+
+    public function syncRoles(array $roleNames): self
+    {
+        DB::connection('tenant')->table('model_has_roles')
+            ->where('model_type', self::class)
+            ->where('model_id', $this->id)
+            ->delete();
+            
+        return $this->assignRole($roleNames);
+    }
+
+    public function getRoleNames(): array
+    {
+        return $this->roles()->pluck('name')->toArray();
+    }
 
     public function reseller()
     {

@@ -5,11 +5,19 @@ namespace App\Http\Controllers\Tenant;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Nas;
 use App\Services\TenantDatabaseManager;
+use App\Services\TenantUsageService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class NasController extends Controller
 {
+    protected TenantUsageService $usageService;
+
+    public function __construct(TenantUsageService $usageService)
+    {
+        $this->usageService = $usageService;
+    }
+
     public function index()
     {
         if (!TenantDatabaseManager::isConnected()) {
@@ -25,11 +33,35 @@ class NasController extends Controller
 
     public function create()
     {
-        return view('tenant.nas.create');
+        $tenant = TenantDatabaseManager::getTenant();
+        $canAdd = $tenant ? $this->usageService->canAddRouter($tenant) : true;
+        $remaining = $tenant ? $this->usageService->getRemainingRouters($tenant) : 1;
+
+        if (!$canAdd) {
+            return redirect()->route('tenant.nas.index')
+                ->with('error', 'Anda telah mencapai batas maksimum router pada paket Anda. Silakan upgrade paket untuk menambah kapasitas.');
+        }
+
+        return view('tenant.nas.create', compact('remaining'));
     }
 
     public function store(Request $request)
     {
+        $tenant = TenantDatabaseManager::getTenant();
+        
+        if ($tenant && !$this->usageService->canAddRouter($tenant)) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Batas maksimum router telah tercapai. Silakan upgrade paket Anda.',
+                    'upgrade_url' => route('tenant.settings.subscription'),
+                ], 403);
+            }
+            
+            return redirect()->route('tenant.nas.index')
+                ->with('error', 'Anda telah mencapai batas maksimum router pada paket Anda. Silakan upgrade paket untuk menambah kapasitas.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'shortname' => 'required|string|max:64|unique:tenant.nas,shortname',

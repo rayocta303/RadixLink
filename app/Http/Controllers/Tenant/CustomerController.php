@@ -6,11 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Tenant\Customer;
 use App\Models\Tenant\ServicePlan;
 use App\Services\TenantDatabaseManager;
+use App\Services\TenantUsageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class CustomerController extends Controller
 {
+    protected TenantUsageService $usageService;
+
+    public function __construct(TenantUsageService $usageService)
+    {
+        $this->usageService = $usageService;
+    }
+
     public function index()
     {
         if (!TenantDatabaseManager::isConnected()) {
@@ -31,8 +39,17 @@ class CustomerController extends Controller
                 ->with('error', 'Database tenant belum dikonfigurasi.');
         }
 
+        $tenant = TenantDatabaseManager::getTenant();
+        $canAdd = $tenant ? $this->usageService->canAddCustomer($tenant) : true;
+        $remaining = $tenant ? $this->usageService->getRemainingCustomers($tenant) : 25;
+
+        if (!$canAdd) {
+            return redirect()->route('tenant.customers.index')
+                ->with('error', 'Anda telah mencapai batas maksimum pelanggan pada paket Anda. Silakan upgrade paket untuk menambah kapasitas.');
+        }
+
         $servicePlans = ServicePlan::where('is_active', true)->get();
-        return view('tenant.customers.create', compact('servicePlans'));
+        return view('tenant.customers.create', compact('servicePlans', 'remaining'));
     }
 
     public function store(Request $request)
@@ -40,6 +57,21 @@ class CustomerController extends Controller
         if (!TenantDatabaseManager::isConnected()) {
             return redirect()->route('tenant.customers.index')
                 ->with('error', 'Database tenant belum dikonfigurasi.');
+        }
+
+        $tenant = TenantDatabaseManager::getTenant();
+        
+        if ($tenant && !$this->usageService->canAddCustomer($tenant)) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Batas maksimum pelanggan telah tercapai. Silakan upgrade paket Anda.',
+                    'upgrade_url' => route('tenant.settings.subscription'),
+                ], 403);
+            }
+            
+            return redirect()->route('tenant.customers.index')
+                ->with('error', 'Anda telah mencapai batas maksimum pelanggan pada paket Anda. Silakan upgrade paket untuk menambah kapasitas.');
         }
 
         $validated = $request->validate([

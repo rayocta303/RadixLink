@@ -122,4 +122,107 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     {
         return $this->is_active && !$this->is_suspended && !$this->isExpired();
     }
+
+    public function getSubscriptionPlan(): ?SubscriptionPlan
+    {
+        $activeSubscription = $this->subscription()
+            ->where('status', 'active')
+            ->whereNull('cancelled_at')
+            ->where(function ($query) {
+                $query->whereNull('ends_at')
+                    ->orWhere('ends_at', '>', now());
+            })
+            ->with('plan')
+            ->first();
+
+        if ($activeSubscription && $activeSubscription->plan) {
+            return $activeSubscription->plan;
+        }
+
+        if ($this->subscription_plan) {
+            return SubscriptionPlan::where('slug', $this->subscription_plan)->first();
+        }
+
+        return SubscriptionPlan::where('slug', 'free')->first();
+    }
+
+    public function getUsageService(): \App\Services\TenantUsageService
+    {
+        return app(\App\Services\TenantUsageService::class);
+    }
+
+    public function canAddRouter(): bool
+    {
+        return $this->getUsageService()->canAddRouter($this);
+    }
+
+    public function canAddCustomer(): bool
+    {
+        return $this->getUsageService()->canAddCustomer($this);
+    }
+
+    public function canAddVoucher(int $count = 1): bool
+    {
+        return $this->getUsageService()->canAddVoucher($this, $count);
+    }
+
+    public function canAddOnlineUser(): bool
+    {
+        return $this->getUsageService()->canAddOnlineUser($this);
+    }
+
+    public function getUsageStats(): array
+    {
+        return $this->getUsageService()->getUsageWithLimits($this);
+    }
+
+    public function getRemainingRouters(): int
+    {
+        return $this->getUsageService()->getRemainingRouters($this);
+    }
+
+    public function getRemainingCustomers(): int
+    {
+        return $this->getUsageService()->getRemainingCustomers($this);
+    }
+
+    public function getRemainingVouchers(): int
+    {
+        return $this->getUsageService()->getRemainingVouchers($this);
+    }
+
+    public function getRemainingOnlineUsers(): int
+    {
+        return $this->getUsageService()->getRemainingOnlineUsers($this);
+    }
+
+    public function getLimitWarnings(): array
+    {
+        return $this->getUsageService()->getLimitWarnings($this);
+    }
+
+    public function isApproachingLimit(string $resource): bool
+    {
+        return $this->getUsageService()->isApproachingLimit($this, $resource);
+    }
+
+    public function hasFeature(string $feature): bool
+    {
+        return $this->getUsageService()->hasFeature($this, $feature);
+    }
+
+    public function canUseCustomDomain(): bool
+    {
+        return $this->getUsageService()->canUseCustomDomain($this);
+    }
+
+    public function canUseApi(): bool
+    {
+        return $this->getUsageService()->canUseApi($this);
+    }
+
+    public function hasPrioritySupport(): bool
+    {
+        return $this->getUsageService()->hasPrioritySupport($this);
+    }
 }

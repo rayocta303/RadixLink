@@ -6,11 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Tenant\Voucher;
 use App\Models\Tenant\ServicePlan;
 use App\Services\TenantDatabaseManager;
+use App\Services\TenantUsageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class VoucherController extends Controller
 {
+    protected TenantUsageService $usageService;
+
+    public function __construct(TenantUsageService $usageService)
+    {
+        $this->usageService = $usageService;
+    }
+
     public function index()
     {
         if (!TenantDatabaseManager::isConnected()) {
@@ -40,8 +48,16 @@ class VoucherController extends Controller
                 ->with('error', 'Database tenant belum dikonfigurasi.');
         }
 
+        $tenant = TenantDatabaseManager::getTenant();
+        $remaining = $tenant ? $this->usageService->getRemainingVouchers($tenant) : 50;
+
+        if ($remaining <= 0) {
+            return redirect()->route('tenant.vouchers.index')
+                ->with('error', 'Anda telah mencapai batas maksimum voucher pada paket Anda. Silakan upgrade paket untuk menambah kapasitas.');
+        }
+
         $servicePlans = ServicePlan::where('is_active', true)->get();
-        return view('tenant.vouchers.create', compact('servicePlans'));
+        return view('tenant.vouchers.create', compact('servicePlans', 'remaining'));
     }
 
     public function store(Request $request)
@@ -49,6 +65,32 @@ class VoucherController extends Controller
         if (!TenantDatabaseManager::isConnected()) {
             return redirect()->route('tenant.vouchers.index')
                 ->with('error', 'Database tenant belum dikonfigurasi.');
+        }
+
+        $tenant = TenantDatabaseManager::getTenant();
+        $quantity = (int) $request->input('quantity', 1);
+        
+        if ($tenant) {
+            $remaining = $this->usageService->getRemainingVouchers($tenant);
+            
+            if (!$this->usageService->canAddVoucher($tenant, $quantity)) {
+                $errorMessage = $remaining > 0
+                    ? "Anda hanya dapat membuat {$remaining} voucher lagi pada paket Anda."
+                    : 'Anda telah mencapai batas maksimum voucher pada paket Anda.';
+                $errorMessage .= ' Silakan upgrade paket untuk menambah kapasitas.';
+                
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $errorMessage,
+                        'remaining' => $remaining,
+                        'upgrade_url' => route('tenant.settings.subscription'),
+                    ], 403);
+                }
+                
+                return redirect()->route('tenant.vouchers.index')
+                    ->with('error', $errorMessage);
+            }
         }
 
         $validated = $request->validate([
@@ -155,8 +197,16 @@ class VoucherController extends Controller
                 ->with('error', 'Database tenant belum dikonfigurasi.');
         }
 
+        $tenant = TenantDatabaseManager::getTenant();
+        $remaining = $tenant ? $this->usageService->getRemainingVouchers($tenant) : 50;
+
+        if ($remaining <= 0) {
+            return redirect()->route('tenant.vouchers.index')
+                ->with('error', 'Anda telah mencapai batas maksimum voucher pada paket Anda. Silakan upgrade paket untuk menambah kapasitas.');
+        }
+
         $servicePlans = ServicePlan::where('is_active', true)->get();
-        return view('tenant.vouchers.generate', compact('servicePlans'));
+        return view('tenant.vouchers.generate', compact('servicePlans', 'remaining'));
     }
 
     public function generate(Request $request)
