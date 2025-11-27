@@ -107,12 +107,12 @@
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white">Berdasarkan Tipe Layanan</h3>
         </div>
-        <div class="p-6">
+        <div class="p-4 sm:p-6">
             <dl class="space-y-4">
                 @foreach($customerStats['by_service_type'] ?? [] as $type => $count)
                 <div class="flex items-center justify-between">
@@ -125,10 +125,10 @@
     </div>
 
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white">Pelanggan Terbaru</h3>
         </div>
-        <div class="p-6">
+        <div class="p-4 sm:p-6">
             <ul class="divide-y divide-gray-200 dark:divide-gray-700">
                 @forelse($customerStats['recent'] ?? [] as $customer)
                 <li class="py-3">

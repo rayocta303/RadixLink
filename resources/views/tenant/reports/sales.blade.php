@@ -97,7 +97,7 @@
     </div>
 
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-        <div class="p-6">
+        <div class="p-4 sm:p-6 overflow-x-auto">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Riwayat Penjualan</h3>
             <table id="salesTable" class="w-full stripe hover">
                 <thead>

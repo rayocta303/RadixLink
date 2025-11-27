@@ -104,7 +104,7 @@
 <div class="mt-12">
     <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-6">Tenant Berlangganan</h3>
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-        <div class="p-6">
+        <div class="p-4 sm:p-6 overflow-x-auto">
             <table id="subscriptionsTable" class="w-full stripe hover">
                 <thead>
                     <tr>

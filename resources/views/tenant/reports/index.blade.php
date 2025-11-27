@@ -147,8 +147,8 @@
     </a>
 </div>
 
-<div class="mt-8 bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-    <div class="p-6">
+<div class="mt-6 sm:mt-8 bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+    <div class="p-4 sm:p-6 overflow-x-auto">
         <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Transaksi Terakhir</h3>
         <table id="transactionsTable" class="w-full stripe hover">
             <thead>
