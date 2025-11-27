@@ -27,7 +27,8 @@ use App\Http\Controllers\Tenant\MonitoringController as TenantMonitoringControll
 use App\Http\Controllers\Tenant\ActivityLogController as TenantActivityLogController;
 
 Route::get('/', function () {
-    return view('welcome');
+    $plans = \App\Models\SubscriptionPlan::active()->ordered()->get();
+    return view('welcome', compact('plans'));
 })->name('home');
 
 Route::middleware('guest')->group(function () {
@@ -50,28 +51,28 @@ Route::middleware('auth')->group(function () {
             Route::resource('tenants', TenantController::class);
             Route::post('tenants/{tenant}/suspend', [TenantController::class, 'suspend'])->name('tenants.suspend');
             Route::post('tenants/{tenant}/activate', [TenantController::class, 'activate'])->name('tenants.activate');
-            
+
             Route::get('monitoring', [MonitoringController::class, 'index'])->name('monitoring');
             Route::get('monitoring/stats', [MonitoringController::class, 'stats'])->name('monitoring.stats');
         });
-        
+
         Route::middleware('platform.role:super_admin,platform_admin,platform_cashier')->group(function () {
             Route::resource('subscriptions', SubscriptionController::class);
             Route::resource('invoices', PlatformInvoiceController::class);
         });
-        
+
         Route::middleware('platform.role:super_admin,platform_admin,platform_support')->group(function () {
             Route::resource('tickets', PlatformTicketController::class);
             Route::post('tickets/{ticket}/reply', [PlatformTicketController::class, 'reply'])->name('tickets.reply');
         });
-        
+
         Route::middleware('platform.role:super_admin,platform_admin')->group(function () {
             Route::resource('users', PlatformUserController::class);
             Route::get('settings', [PlatformSettingsController::class, 'index'])->name('settings');
             Route::put('settings', [PlatformSettingsController::class, 'update'])->name('settings.update');
             Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
         });
-        
+
         Route::middleware('platform.role:super_admin')->group(function () {
             Route::resource('roles', RoleController::class);
         });
@@ -82,42 +83,42 @@ Route::middleware('auth')->group(function () {
             Route::resource('nas', NasController::class);
             Route::post('nas/{nas}/test', [NasController::class, 'test'])->name('nas.test');
             Route::get('nas-map', [NasController::class, 'map'])->name('nas.map');
-            
+
             Route::get('monitoring', [TenantMonitoringController::class, 'index'])->name('monitoring');
             Route::get('monitoring/stats', [TenantMonitoringController::class, 'stats'])->name('monitoring.stats');
             Route::get('monitoring/online', [TenantMonitoringController::class, 'onlineUsers'])->name('monitoring.online');
         });
-        
+
         Route::middleware('tenant.role:owner,admin')->group(function () {
             Route::resource('services', ServicePlanController::class);
         });
-        
+
         Route::middleware('tenant.role:owner,admin,reseller')->group(function () {
             Route::resource('customers', CustomerController::class);
             Route::post('customers/{customer}/suspend', [CustomerController::class, 'suspend'])->name('customers.suspend');
             Route::post('customers/{customer}/activate', [CustomerController::class, 'activate'])->name('customers.activate');
         });
-        
+
         Route::middleware('tenant.role:owner,admin,cashier,reseller')->group(function () {
             Route::resource('vouchers', VoucherController::class);
             Route::get('vouchers/generate', [VoucherController::class, 'showGenerate'])->name('vouchers.generate');
             Route::post('vouchers/generate', [VoucherController::class, 'generate'])->name('vouchers.generate.store');
             Route::get('vouchers/print/{batch}', [VoucherController::class, 'print'])->name('vouchers.print');
         });
-        
+
         Route::middleware('tenant.role:owner,admin,cashier')->group(function () {
             Route::resource('invoices', InvoiceController::class);
             Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
             Route::post('invoices/{invoice}/pay', [InvoiceController::class, 'pay'])->name('invoices.pay');
         });
-        
+
         Route::middleware('tenant.role:owner,admin,cashier,investor')->group(function () {
             Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
             Route::get('reports/sales', [ReportController::class, 'sales'])->name('reports.sales');
             Route::get('reports/customers', [ReportController::class, 'customers'])->name('reports.customers');
             Route::get('reports/revenue', [ReportController::class, 'revenue'])->name('reports.revenue');
         });
-        
+
         Route::middleware('tenant.role:owner,admin')->group(function () {
             Route::get('settings', [TenantSettingsController::class, 'index'])->name('settings');
             Route::put('settings', [TenantSettingsController::class, 'update'])->name('settings.update');
