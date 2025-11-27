@@ -1,0 +1,124 @@
+# ParseError - Internal Server Error
+
+Unclosed '[' does not match ')'
+
+PHP 8.4.10
+Laravel 12.40.2
+70d61dd4-7d23-4ca4-bed3-46d11594c8e6-00-3tcxmias292j3.pike.replit.dev
+
+## Stack Trace
+
+0 - resources/views/tenant/reports/index.blade.php:207
+1 - vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php:124
+2 - vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php:57
+3 - vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php:76
+4 - vendor/laravel/framework/src/Illuminate/View/View.php:208
+5 - vendor/laravel/framework/src/Illuminate/View/View.php:191
+6 - vendor/laravel/framework/src/Illuminate/View/View.php:160
+7 - vendor/laravel/framework/src/Illuminate/Http/Response.php:78
+8 - vendor/laravel/framework/src/Illuminate/Http/Response.php:34
+9 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:939
+10 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:906
+11 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:821
+12 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+13 - app/Http/Middleware/TenantUserMiddleware.php:43
+14 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+15 - vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php:50
+16 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+17 - vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php:63
+18 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+19 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/VerifyCsrfToken.php:87
+20 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+21 - vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php:48
+22 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+23 - vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php:120
+24 - vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php:63
+25 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+26 - vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php:36
+27 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+28 - vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php:74
+29 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+30 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+31 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:821
+32 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:800
+33 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:764
+34 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:753
+35 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:200
+36 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+37 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php:21
+38 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php:31
+39 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+40 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php:21
+41 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php:51
+42 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+43 - vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php:27
+44 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+45 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php:109
+46 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+47 - vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php:48
+48 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+49 - vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php:58
+50 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+51 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php:22
+52 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+53 - vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php:26
+54 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+55 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+56 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:175
+57 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:144
+58 - vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1220
+59 - public/index.php:20
+60 - vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php:23
+
+## Request
+
+GET /tenant/reports
+
+## Headers
+
+* **host**: 70d61dd4-7d23-4ca4-bed3-46d11594c8e6-00-3tcxmias292j3.pike.replit.dev
+* **user-agent**: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+* **accept**: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+* **accept-encoding**: gzip, deflate, br, zstd
+* **accept-language**: en-US,en;q=0.9
+* **cookie**: XSRF-TOKEN=eyJpdiI6IlIwOXRNK01lNk04NzlBOVNEWEc4SFE9PSIsInZhbHVlIjoidUsxZmFTdXMycHFLaWhkVkg5ZmxiWXQzTmNoZ0xlOFVibTVCUGxtN0k0MHJISWlsU3pXc1A2VmNNTHB0MXdHNy8xdnNSQk85SVBCVjJWSHlHQ1V2dGdXRTFsUVZWbEVJS3Z2dFFhV2oyQkRLbEk1U1Z2V0t6NktVbjBTb1laQ2QiLCJtYWMiOiJhNWE0ZmVjYzFlMTVjNmUwODk2ZGQ4ZjAzZjY3ZjNkNDUzYTcxMzZiZGQ1ZWY4NWQ5YTM1NTgyZDdmMmU5YTA1IiwidGFnIjoiIn0%3D; isp-manager-saas-session=eyJpdiI6InNrUzR3V0duZXJhZFRwS1k1Wm9SNnc9PSIsInZhbHVlIjoiMTgwbkt3RklpL2lXVlhUaksxamk5RTlEc2Y4cEtHREQ2U3c0YTdabGR5Uk1OeUlkNTJmOHVMeXpCU3NsNjhMWDExWk1qQmVENEpzdkJVVUI3NEtyMXJneXFMMGwxUEV5cTVHOGl1bzY4ZnVBQkxkd0svM1g3UWV6RWFUZ2JVMUsiLCJtYWMiOiI4YzAwZWJlY2Q4MDRlN2MzODBlYTNhMWE0ZGE1N2UzOWYyOTI5M2FmZWE0MzdiZTRjMjM2ZjllY2E5MDk2OWE1IiwidGFnIjoiIn0%3D
+* **sec-ch-ua**: "Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"
+* **sec-ch-ua-mobile**: ?0
+* **sec-ch-ua-platform**: "Windows"
+* **sec-fetch-dest**: document
+* **sec-fetch-mode**: navigate
+* **sec-fetch-site**: cross-site
+* **sec-fetch-user**: ?1
+* **upgrade-insecure-requests**: 1
+* **x-forwarded-for**: 182.2.47.132, 10.84.3.89
+* **x-forwarded-proto**: https
+* **x-replit-user-bio**: 
+* **x-replit-user-id**: 
+* **x-replit-user-name**: 
+* **x-replit-user-profile-image**: 
+* **x-replit-user-roles**: 
+* **x-replit-user-teams**: 
+* **x-replit-user-url**: 
+
+## Route Context
+
+controller: App\Http\Controllers\Tenant\ReportController@index
+route name: tenant.reports.index
+middleware: web, auth, tenant.user
+
+## Route Parameters
+
+No route parameter data available.
+
+## Database Queries
+
+* mysql - select * from `users` where `id` = 5 limit 1 (805.19 ms)
+* mysql - select * from `tenants` where `tenants`.`id` = 'e83f5424-6153-49cf-8915-699f5bab71f0' limit 1 (166.55 ms)
+* tenant - select count(*) as aggregate from `customers` (162.09 ms)
+* tenant - select count(*) as aggregate from `customers` where `status` = 'active' (173.33 ms)
+* tenant - select count(*) as aggregate from `vouchers` (164.53 ms)
+* tenant - select count(*) as aggregate from `vouchers` where `status` = 'unused' (186.85 ms)
+* tenant - select count(*) as aggregate from `vouchers` where `status` = 'used' (199.55 ms)
+* tenant - select sum(`total`) as aggregate from `invoices` where `status` = 'paid' and date(`paid_at`) = '2025-11-27' (161.53 ms)
+* tenant - select sum(`total`) as aggregate from `invoices` where `status` = 'paid' and month(`paid_at`) = '11' and year(`paid_at`) = 2025 (172.09 ms)
+* tenant - select count(*) as aggregate from `invoices` where `status` = 'pending' (166.9 ms)
