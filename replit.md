@@ -58,16 +58,27 @@ The platform employs a multi-tenant architecture where each ISP (tenant) operate
 - Changed all enum types to string types for better database compatibility
 - Platform activity logs now use `platform_activity_logs` table
 - Tenant activity logs use `activity_logs` table in tenant databases
+- Added tenant database credential columns to tenants table:
+  - `tenancy_db_name` - Tenant database name
+  - `tenancy_db_username` - Database username
+  - `tenancy_db_password` - Database password (encrypted)
+  - `tenancy_db_host` - Database host
+
+### Tenant Provisioning
+- Registration now uses `TenantProvisioningService` for automatic tenant creation
+- New tenants get 'free' plan by default with limited resources
+- Tenant database is automatically created via cPanel when in 'cpanel' mode
+- Plan limits are defined per subscription tier (see Subscription Plans)
 
 ### Subscription Plans
 Available subscription plans (from SubscriptionPlanSeeder):
-1. **Free (Trial)** - slug: `free` - Rp 0
-2. **Starter** - slug: `starter` - Rp 99.000/bulan
-3. **Basic** - slug: `basic` - Rp 199.000/bulan
-4. **Professional** - slug: `professional` - Rp 399.000/bulan
-5. **Business** - slug: `business` - Rp 799.000/bulan
-6. **Enterprise** - slug: `enterprise` - Rp 1.499.000/bulan
-7. **Platinum (Unlimited)** - slug: `platinum` - Rp 2.999.000/bulan
+1. **Free** - slug: `free` - Rp 0 (1 router, 50 users, 100 vouchers)
+2. **Starter** - slug: `starter` - Rp 99.000/bulan (5 routers, 1000 users, 10K vouchers)
+3. **Basic** - slug: `basic` - Rp 199.000/bulan (10 routers, 2000 users, 20K vouchers)
+4. **Professional** - slug: `professional` - Rp 399.000/bulan (25 routers, 5000 users, 50K vouchers)
+5. **Business** - slug: `business` - Rp 799.000/bulan (50 routers, 10K users, 100K vouchers)
+6. **Enterprise** - slug: `enterprise` - Rp 1.499.000/bulan (100 routers, 50K users, 500K vouchers)
+7. **Platinum (Unlimited)** - slug: `platinum` - Rp 2.999.000/bulan (Unlimited resources)
 
 ### Platform Roles
 - `super_admin` - Full access to all platform features
@@ -75,6 +86,7 @@ Available subscription plans (from SubscriptionPlanSeeder):
 - `platform_cashier` - Manage billing and invoices
 - `platform_technician` - Server and RADIUS monitoring
 - `platform_support` - Handle support tickets
+- `tenant_owner` - Tenant owner (platform-level role for tenant users)
 
 ### Default Login Credentials
 - **Super Admin**: admin@ispmanager.id / admin123
@@ -82,3 +94,9 @@ Available subscription plans (from SubscriptionPlanSeeder):
 - **Support Staff**: support@ispmanager.id / support123
 - **Cashier Staff**: cashier@ispmanager.id / cashier123
 - **Technician Staff**: technician@ispmanager.id / technician123
+
+### Bug Fixes
+- Fixed DashboardController to use `PlatformActivityLog` model instead of `ActivityLog`
+- Removed incorrect `tenant_id` filtering from platform activity logs query
+- Removed trial feature (trial_ends_at) from all models, migrations, and views
+- Updated platform monitoring to show "Tenant Baru Bulan Ini" instead of "Masa Trial"

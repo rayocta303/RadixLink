@@ -122,7 +122,7 @@ class VoucherController extends Controller
         }
 
         $validated = $request->validate([
-            'service_plan_id' => 'required|exists:tenant.service_plans,id',
+            'service_plan_id' => 'required|integer',
             'quantity' => 'required|integer|min:1|max:500',
             'type' => 'required|in:single,multi',
             'max_usage' => 'required_if:type,multi|integer|min:2|max:100',
@@ -132,6 +132,12 @@ class VoucherController extends Controller
         ]);
 
         $servicePlan = ServicePlan::find($validated['service_plan_id']);
+        if (!$servicePlan) {
+            return redirect()->route('tenant.vouchers.create')
+                ->with('error', 'Paket layanan tidak ditemukan.')
+                ->withInput();
+        }
+
         $batchId = 'BATCH-' . strtoupper(Str::random(8));
         $quantity = $validated['quantity'];
         $prefix = $validated['prefix'] ?? '';
@@ -207,8 +213,15 @@ class VoucherController extends Controller
 
         $validated = $request->validate([
             'status' => 'required|in:unused,used,expired,disabled',
-            'service_plan_id' => 'required|exists:tenant.service_plans,id',
+            'service_plan_id' => 'required|integer',
         ]);
+
+        $servicePlan = ServicePlan::find($validated['service_plan_id']);
+        if (!$servicePlan) {
+            return redirect()->route('tenant.vouchers.edit', $id)
+                ->with('error', 'Paket layanan tidak ditemukan.')
+                ->withInput();
+        }
 
         $voucher->update($validated);
 
