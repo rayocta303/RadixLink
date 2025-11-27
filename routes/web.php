@@ -10,6 +10,9 @@ use App\Http\Controllers\Platform\PlatformInvoiceController;
 use App\Http\Controllers\Platform\PlatformTicketController;
 use App\Http\Controllers\Platform\PlatformUserController;
 use App\Http\Controllers\Platform\PlatformSettingsController;
+use App\Http\Controllers\Platform\RoleController;
+use App\Http\Controllers\Platform\MonitoringController;
+use App\Http\Controllers\Platform\ActivityLogController;
 use App\Http\Controllers\Tenant\NasController;
 use App\Http\Controllers\Tenant\ServicePlanController;
 use App\Http\Controllers\Tenant\CustomerController;
@@ -18,6 +21,10 @@ use App\Http\Controllers\Tenant\InvoiceController;
 use App\Http\Controllers\Tenant\ReportController;
 use App\Http\Controllers\Tenant\TenantSettingsController;
 use App\Http\Controllers\Tenant\RouterScriptController;
+use App\Http\Controllers\Tenant\UserController;
+use App\Http\Controllers\Tenant\RoleController as TenantRoleController;
+use App\Http\Controllers\Tenant\MonitoringController as TenantMonitoringController;
+use App\Http\Controllers\Tenant\ActivityLogController as TenantActivityLogController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -43,6 +50,9 @@ Route::middleware('auth')->group(function () {
             Route::resource('tenants', TenantController::class);
             Route::post('tenants/{tenant}/suspend', [TenantController::class, 'suspend'])->name('tenants.suspend');
             Route::post('tenants/{tenant}/activate', [TenantController::class, 'activate'])->name('tenants.activate');
+            
+            Route::get('monitoring', [MonitoringController::class, 'index'])->name('monitoring');
+            Route::get('monitoring/stats', [MonitoringController::class, 'stats'])->name('monitoring.stats');
         });
         
         Route::middleware('platform.role:super_admin,platform_admin,platform_cashier')->group(function () {
@@ -59,6 +69,11 @@ Route::middleware('auth')->group(function () {
             Route::resource('users', PlatformUserController::class);
             Route::get('settings', [PlatformSettingsController::class, 'index'])->name('settings');
             Route::put('settings', [PlatformSettingsController::class, 'update'])->name('settings.update');
+            Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+        });
+        
+        Route::middleware('platform.role:super_admin')->group(function () {
+            Route::resource('roles', RoleController::class);
         });
     });
 
@@ -67,6 +82,10 @@ Route::middleware('auth')->group(function () {
             Route::resource('nas', NasController::class);
             Route::post('nas/{nas}/test', [NasController::class, 'test'])->name('nas.test');
             Route::get('nas-map', [NasController::class, 'map'])->name('nas.map');
+            
+            Route::get('monitoring', [TenantMonitoringController::class, 'index'])->name('monitoring');
+            Route::get('monitoring/stats', [TenantMonitoringController::class, 'stats'])->name('monitoring.stats');
+            Route::get('monitoring/online', [TenantMonitoringController::class, 'onlineUsers'])->name('monitoring.online');
         });
         
         Route::middleware('tenant.role:owner,admin')->group(function () {
@@ -102,6 +121,9 @@ Route::middleware('auth')->group(function () {
         Route::middleware('tenant.role:owner,admin')->group(function () {
             Route::get('settings', [TenantSettingsController::class, 'index'])->name('settings');
             Route::put('settings', [TenantSettingsController::class, 'update'])->name('settings.update');
+            Route::resource('users', UserController::class);
+            Route::resource('roles', TenantRoleController::class);
+            Route::get('activity-logs', [TenantActivityLogController::class, 'index'])->name('activity-logs.index');
         });
 
         Route::middleware('tenant.role:owner,admin,technician')->prefix('router-scripts')->name('router-scripts.')->group(function () {
