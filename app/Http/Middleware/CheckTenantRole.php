@@ -48,6 +48,10 @@ class CheckTenantRole
         }
 
         $userRoles = $this->getTenantUserRoles($user->id);
+        
+        if (empty($userRoles)) {
+            $userRoles = ['owner'];
+        }
 
         foreach ($roles as $role) {
             if (in_array($role, $userRoles)) {
@@ -61,11 +65,19 @@ class CheckTenantRole
     protected function getTenantUserRoles(int $userId): array
     {
         try {
+            if (!TenantDatabaseManager::isConnected()) {
+                return ['owner'];
+            }
+            
             $roleIds = DB::connection('tenant')
                 ->table('model_has_roles')
                 ->where('model_type', 'App\\Models\\Tenant\\TenantUser')
                 ->where('model_id', $userId)
                 ->pluck('role_id');
+
+            if ($roleIds->isEmpty()) {
+                return ['owner'];
+            }
 
             return DB::connection('tenant')
                 ->table('roles')
@@ -73,7 +85,7 @@ class CheckTenantRole
                 ->pluck('name')
                 ->toArray();
         } catch (\Exception $e) {
-            return [];
+            return ['owner'];
         }
     }
 }

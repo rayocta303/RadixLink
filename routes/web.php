@@ -62,7 +62,7 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    Route::prefix('tenant')->name('tenant.')->middleware('tenant.role:owner,admin,technician,cashier,support,reseller,investor')->group(function () {
+    Route::prefix('tenant')->name('tenant.')->middleware('tenant.user')->group(function () {
         Route::middleware('tenant.role:owner,admin,technician')->group(function () {
             Route::resource('nas', NasController::class);
             Route::post('nas/{nas}/test', [NasController::class, 'test'])->name('nas.test');

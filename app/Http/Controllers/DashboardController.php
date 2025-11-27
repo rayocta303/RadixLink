@@ -11,6 +11,7 @@ use App\Models\Tenant\Customer;
 use App\Models\Tenant\Voucher;
 use App\Models\Tenant\Invoice;
 use App\Services\TenantDatabaseManager;
+use App\Services\TenantUsageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -23,6 +24,8 @@ class DashboardController extends Controller
         $activities = collect();
         $chartData = [];
         $tenantDbConnected = false;
+        $usageData = null;
+        $subscriptionInfo = null;
 
         if ($user->isPlatformUser()) {
             $stats = $this->getPlatformStats();
@@ -42,6 +45,8 @@ class DashboardController extends Controller
                 if ($tenantDbConnected) {
                     $stats = $this->getTenantStats();
                     $chartData = $this->getTenantChartData();
+                    $usageData = $this->getTenantUsageData($tenant);
+                    $subscriptionInfo = $this->getSubscriptionInfo($tenant);
                 } else {
                     $stats = $this->getEmptyTenantStats();
                 }
@@ -50,7 +55,60 @@ class DashboardController extends Controller
             }
         }
 
-        return view('dashboard', compact('stats', 'activities', 'chartData', 'tenantDbConnected'));
+        return view('dashboard', compact('stats', 'activities', 'chartData', 'tenantDbConnected', 'usageData', 'subscriptionInfo'));
+    }
+
+    protected function getTenantUsageData(Tenant $tenant): array
+    {
+        try {
+            $usageService = new TenantUsageService();
+            return $usageService->getUsageWithLimits($tenant);
+        } catch (\Exception $e) {
+            return [
+                'usage' => [
+                    'routers' => 0,
+                    'customers' => 0,
+                    'vouchers' => 0,
+                    'online_users' => 0,
+                ],
+                'limits' => [
+                    'max_routers' => 1,
+                    'max_users' => 25,
+                    'max_vouchers' => 50,
+                    'max_online_users' => 5,
+                ],
+                'percentage' => [
+                    'routers' => 0,
+                    'customers' => 0,
+                    'vouchers' => 0,
+                    'online_users' => 0,
+                ],
+                'remaining' => [
+                    'routers' => 1,
+                    'customers' => 25,
+                    'vouchers' => 50,
+                    'online_users' => 5,
+                ],
+            ];
+        }
+    }
+
+    protected function getSubscriptionInfo(Tenant $tenant): array
+    {
+        $plan = $tenant->getSubscriptionPlan();
+        $subscription = $tenant->subscription;
+        
+        return [
+            'plan_name' => $plan ? $plan->name : 'Free (Trial)',
+            'plan_slug' => $plan ? $plan->slug : 'free',
+            'expires_at' => $tenant->subscription_expires_at,
+            'is_expired' => $tenant->isExpired(),
+            'days_remaining' => $tenant->subscription_expires_at ? now()->diffInDays($tenant->subscription_expires_at, false) : 0,
+            'features' => $plan ? ($plan->features ?? []) : [],
+            'custom_domain' => $plan ? $plan->custom_domain : false,
+            'api_access' => $plan ? $plan->api_access : false,
+            'priority_support' => $plan ? $plan->priority_support : false,
+        ];
     }
 
     protected function getPlatformStats(): array

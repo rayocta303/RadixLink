@@ -25,23 +25,134 @@
             </div>
         @else
             <div class="overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-4 py-5 shadow sm:p-6">
-                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">Active Customers</dt>
+                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">Pelanggan Aktif</dt>
                 <dd class="mt-1 text-3xl font-semibold tracking-tight text-green-600">{{ $stats['active_customers'] ?? 0 }}</dd>
             </div>
             <div class="overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-4 py-5 shadow sm:p-6">
-                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">Online Users</dt>
+                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">User Online</dt>
                 <dd class="mt-1 text-3xl font-semibold tracking-tight text-blue-600">{{ $stats['online_users'] ?? 0 }}</dd>
             </div>
             <div class="overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-4 py-5 shadow sm:p-6">
-                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">Available Vouchers</dt>
+                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">Voucher Tersedia</dt>
                 <dd class="mt-1 text-3xl font-semibold tracking-tight text-purple-600">{{ $stats['available_vouchers'] ?? 0 }}</dd>
             </div>
             <div class="overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-4 py-5 shadow sm:p-6">
-                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">Today's Revenue</dt>
+                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">Pendapatan Hari Ini</dt>
                 <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900 dark:text-white">Rp {{ number_format($stats['today_revenue'] ?? 0) }}</dd>
             </div>
         @endif
     </div>
+
+    @if(!auth()->user()->isPlatformUser() && $usageData && $subscriptionInfo)
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div class="lg:col-span-2 overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">Penggunaan Resource</h3>
+                    <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium {{ $subscriptionInfo['plan_slug'] === 'platinum' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' }}">
+                        {{ $subscriptionInfo['plan_name'] }}
+                    </span>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Router</span>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ $usageData['usage']['routers'] ?? 0 }} / {{ $usageData['limits']['max_routers'] >= 9999 ? 'Unlimited' : $usageData['limits']['max_routers'] }}
+                            </span>
+                        </div>
+                        @php $routerPct = min(100, $usageData['percentage']['routers'] ?? 0); @endphp
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                            <div class="h-2.5 rounded-full {{ $routerPct > 80 ? 'bg-red-500' : ($routerPct > 60 ? 'bg-yellow-500' : 'bg-green-500') }}" style="width: {{ $routerPct }}%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Pelanggan</span>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ $usageData['usage']['customers'] ?? 0 }} / {{ $usageData['limits']['max_users'] >= 99999 ? 'Unlimited' : number_format($usageData['limits']['max_users']) }}
+                            </span>
+                        </div>
+                        @php $customerPct = min(100, $usageData['percentage']['customers'] ?? 0); @endphp
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                            <div class="h-2.5 rounded-full {{ $customerPct > 80 ? 'bg-red-500' : ($customerPct > 60 ? 'bg-yellow-500' : 'bg-green-500') }}" style="width: {{ $customerPct }}%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Voucher</span>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ number_format($usageData['usage']['vouchers'] ?? 0) }} / {{ $usageData['limits']['max_vouchers'] >= 999999 ? 'Unlimited' : number_format($usageData['limits']['max_vouchers']) }}
+                            </span>
+                        </div>
+                        @php $voucherPct = min(100, $usageData['percentage']['vouchers'] ?? 0); @endphp
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                            <div class="h-2.5 rounded-full {{ $voucherPct > 80 ? 'bg-red-500' : ($voucherPct > 60 ? 'bg-yellow-500' : 'bg-green-500') }}" style="width: {{ $voucherPct }}%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">User Online</span>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ $usageData['usage']['online_users'] ?? 0 }} / {{ $usageData['limits']['max_online_users'] >= 9999 ? 'Unlimited' : number_format($usageData['limits']['max_online_users']) }}
+                            </span>
+                        </div>
+                        @php $onlinePct = min(100, $usageData['percentage']['online_users'] ?? 0); @endphp
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                            <div class="h-2.5 rounded-full {{ $onlinePct > 80 ? 'bg-red-500' : ($onlinePct > 60 ? 'bg-yellow-500' : 'bg-green-500') }}" style="width: {{ $onlinePct }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow">
+            <div class="p-6">
+                <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white mb-4">Info Langganan</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500 dark:text-gray-400">Paket</span>
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $subscriptionInfo['plan_name'] }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500 dark:text-gray-400">Status</span>
+                        @if($subscriptionInfo['is_expired'])
+                            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">Kadaluarsa</span>
+                        @else
+                            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Aktif</span>
+                        @endif
+                    </div>
+                    @if($subscriptionInfo['expires_at'])
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500 dark:text-gray-400">Berakhir</span>
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $subscriptionInfo['expires_at']->format('d M Y') }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500 dark:text-gray-400">Sisa Hari</span>
+                        <span class="text-sm font-medium {{ $subscriptionInfo['days_remaining'] < 7 ? 'text-red-600' : 'text-gray-900 dark:text-white' }}">
+                            {{ max(0, $subscriptionInfo['days_remaining']) }} hari
+                        </span>
+                    </div>
+                    @endif
+                    <div class="pt-3 mt-3 border-t border-gray-200 dark:border-gray-700">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Fitur:</p>
+                        <div class="flex flex-wrap gap-2">
+                            @if($subscriptionInfo['custom_domain'])
+                                <span class="inline-flex items-center rounded px-2 py-1 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Custom Domain</span>
+                            @endif
+                            @if($subscriptionInfo['api_access'])
+                                <span class="inline-flex items-center rounded px-2 py-1 text-xs bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">API Access</span>
+                            @endif
+                            @if($subscriptionInfo['priority_support'])
+                                <span class="inline-flex items-center rounded px-2 py-1 text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Priority Support</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div class="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow">
