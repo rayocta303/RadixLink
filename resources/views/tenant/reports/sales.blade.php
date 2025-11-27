@@ -5,12 +5,23 @@
 
 @section('content')
 <div class="space-y-6">
+    @if(isset($dbError))
+    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+        <div class="flex">
+            <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            <p class="ml-3 text-sm text-yellow-700 dark:text-yellow-200">{{ $dbError }}</p>
+        </div>
+    </div>
+    @endif
+
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white">Filter Laporan</h3>
             <form class="flex flex-wrap gap-4">
-                <input type="date" name="start_date" value="{{ request('start_date', now()->startOfMonth()->format('Y-m-d')) }}" class="rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm">
-                <input type="date" name="end_date" value="{{ request('end_date', now()->format('Y-m-d')) }}" class="rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm">
+                <input type="date" name="start_date" value="{{ $startDate ?? now()->startOfMonth()->format('Y-m-d') }}" class="rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm">
+                <input type="date" name="end_date" value="{{ $endDate ?? now()->format('Y-m-d') }}" class="rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm">
                 <button type="submit" class="rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500">Filter</button>
                 <button type="button" onclick="window.print()" class="rounded-md bg-gray-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500">Cetak</button>
             </form>
@@ -31,7 +42,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Penjualan</dt>
-                            <dd class="text-lg font-semibold text-gray-900 dark:text-white">Rp {{ number_format($totalSales ?? 2500000, 0, ',', '.') }}</dd>
+                            <dd class="text-lg font-semibold text-gray-900 dark:text-white">Rp {{ number_format($totalSales ?? 0, 0, ',', '.') }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -50,7 +61,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Voucher Terjual</dt>
-                            <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $voucherSold ?? 156 }}</dd>
+                            <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $voucherSold ?? 0 }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -69,7 +80,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Pelanggan Baru</dt>
-                            <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $newCustomers ?? 23 }}</dd>
+                            <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $newCustomers ?? 0 }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -88,7 +99,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Transaksi</dt>
-                            <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $totalTransactions ?? 189 }}</dd>
+                            <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $totalTransactions ?? 0 }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -99,6 +110,7 @@
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
         <div class="p-4 sm:p-6 overflow-x-auto">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Riwayat Penjualan</h3>
+            @if(isset($salesHistory) && $salesHistory->count() > 0)
             <table id="salesTable" class="w-full stripe hover">
                 <thead>
                     <tr>
@@ -112,32 +124,32 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php
-                    $dummySales = [
-                        ['date' => '2024-01-15 10:30', 'id' => 'TRX-001', 'customer' => 'Andi Pratama', 'type' => 'Voucher', 'item' => 'Paket 10 GB', 'amount' => 25000, 'status' => 'success'],
-                        ['date' => '2024-01-15 11:45', 'id' => 'TRX-002', 'customer' => 'Budi Setiawan', 'type' => 'Langganan', 'item' => 'Paket Bulanan 50 Mbps', 'amount' => 350000, 'status' => 'success'],
-                        ['date' => '2024-01-15 14:20', 'id' => 'TRX-003', 'customer' => 'Dewi Anggraini', 'type' => 'Voucher', 'item' => 'Paket 5 GB', 'amount' => 15000, 'status' => 'success'],
-                        ['date' => '2024-01-15 15:00', 'id' => 'TRX-004', 'customer' => 'Eko Prasetyo', 'type' => 'Langganan', 'item' => 'Paket Bulanan 20 Mbps', 'amount' => 200000, 'status' => 'pending'],
-                        ['date' => '2024-01-14 09:15', 'id' => 'TRX-005', 'customer' => 'Fitri Handayani', 'type' => 'Voucher', 'item' => 'Paket 20 GB', 'amount' => 45000, 'status' => 'success'],
-                    ];
-                    @endphp
-                    @foreach($dummySales as $sale)
+                    @foreach($salesHistory as $sale)
                     <tr>
-                        <td>{{ $sale['date'] }}</td>
-                        <td><span class="font-mono text-sm">{{ $sale['id'] }}</span></td>
-                        <td>{{ $sale['customer'] }}</td>
-                        <td>{{ $sale['type'] }}</td>
-                        <td>{{ $sale['item'] }}</td>
-                        <td class="text-green-600 dark:text-green-400 font-semibold">Rp {{ number_format($sale['amount'], 0, ',', '.') }}</td>
+                        <td>{{ $sale->date }}</td>
+                        <td><span class="font-mono text-sm">{{ $sale->id }}</span></td>
+                        <td>{{ $sale->customer }}</td>
+                        <td>{{ $sale->type }}</td>
+                        <td>{{ $sale->item }}</td>
+                        <td class="text-green-600 dark:text-green-400 font-semibold">Rp {{ number_format($sale->amount, 0, ',', '.') }}</td>
                         <td>
-                            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $sale['status'] === 'success' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' }}">
-                                {{ ucfirst($sale['status']) }}
+                            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $sale->status === 'success' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' }}">
+                                {{ ucfirst($sale->status) }}
                             </span>
                         </td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
+            @else
+            <div class="text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">Tidak ada data penjualan</h3>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Belum ada transaksi penjualan pada periode ini.</p>
+            </div>
+            @endif
         </div>
     </div>
 </div>
@@ -146,10 +158,12 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-    $('#salesTable').DataTable({
-        order: [[0, 'desc']],
-        pageLength: 25
-    });
+    if ($('#salesTable').length) {
+        $('#salesTable').DataTable({
+            order: [[0, 'desc']],
+            pageLength: 25
+        });
+    }
 });
 </script>
 @endpush
