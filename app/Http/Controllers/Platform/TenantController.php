@@ -4,10 +4,19 @@ namespace App\Http\Controllers\Platform;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
+use App\Services\TenantProvisioningService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class TenantController extends Controller
 {
+    protected TenantProvisioningService $provisioningService;
+
+    public function __construct(TenantProvisioningService $provisioningService)
+    {
+        $this->provisioningService = $provisioningService;
+    }
+
     public function index()
     {
         $tenants = Tenant::with('subscription')->latest()->paginate(15);
@@ -27,22 +36,21 @@ class TenantController extends Controller
             'company_name' => 'required|string|max:255',
             'subdomain' => 'required|string|max:63|alpha_dash|unique:tenants,subdomain',
             'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
             'subscription_plan' => 'required|string',
+            'password' => 'nullable|string|min:8',
         ]);
 
-        $tenant = Tenant::create([
-            'id' => $validated['subdomain'],
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'company_name' => $validated['company_name'],
-            'subdomain' => $validated['subdomain'],
-            'phone' => $validated['phone'] ?? null,
-            'subscription_plan' => $validated['subscription_plan'],
-            'subscription_expires_at' => now()->addMonth(),
-            'is_active' => true,
-        ]);
+        try {
+            $tenant = $this->provisioningService->provision($validated);
 
-        return redirect()->route('platform.tenants.index')->with('success', 'Tenant created successfully.');
+            return redirect()->route('platform.tenants.index')
+                ->with('success', "Tenant {$tenant->company_name} berhasil dibuat dengan database terpisah.");
+        } catch (\Exception $e) {
+            Log::error("Failed to create tenant: " . $e->getMessage());
+            return back()->withInput()
+                ->with('error', 'Gagal membuat tenant: ' . $e->getMessage());
+        }
     }
 
     public function show(Tenant $tenant)
@@ -75,8 +83,15 @@ class TenantController extends Controller
 
     public function destroy(Tenant $tenant)
     {
-        $tenant->delete();
-        return redirect()->route('platform.tenants.index')->with('success', 'Tenant deleted successfully.');
+        try {
+            $this->provisioningService->deprovision($tenant);
+            $tenant->delete();
+            return redirect()->route('platform.tenants.index')
+                ->with('success', 'Tenant dan database berhasil dihapus.');
+        } catch (\Exception $e) {
+            Log::error("Failed to delete tenant: " . $e->getMessage());
+            return back()->with('error', 'Gagal menghapus tenant: ' . $e->getMessage());
+        }
     }
 
     public function suspend(Tenant $tenant, Request $request)
