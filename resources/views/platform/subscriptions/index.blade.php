@@ -22,10 +22,10 @@
     <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-6">Paket Langganan</h3>
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-4">
         @forelse($plans as $plan)
-        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden {{ $plan->slug === 'premium' ? 'ring-2 ring-primary-500' : '' }}">
-            @if($plan->slug === 'premium')
+        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden {{ $plan->slug === 'cloud-special' ? 'ring-2 ring-primary-500' : '' }}">
+            @if($plan->slug === 'cloud-special')
             <div class="absolute top-0 right-0 bg-primary-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
-                POPULER
+                BEST SELLER
             </div>
             @endif
             <div class="p-6">
@@ -59,24 +59,46 @@
                         <span>Maks. <strong>{{ $plan->max_vouchers >= 999999 ? 'Unlimited' : number_format($plan->max_vouchers) }}</strong> Voucher</span>
                     </li>
                     @if($plan->features)
-                        @php $features = is_array($plan->features) ? $plan->features : json_decode($plan->features, true); @endphp
-                        @if($features)
-                            @foreach($features as $feature => $enabled)
-                                @if($enabled)
-                                <li class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                    <svg class="h-5 w-5 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                                    </svg>
-                                    <span>{{ ucwords(str_replace('_', ' ', $feature)) }}</span>
-                                </li>
-                                @endif
-                            @endforeach
-                        @endif
+                        @php 
+                            $rawFeatures = $plan->features;
+                            $featureList = [];
+                            
+                            if (is_string($rawFeatures)) {
+                                $decoded = json_decode($rawFeatures, true);
+                                if (is_array($decoded)) {
+                                    if (array_is_list($decoded)) {
+                                        $featureList = $decoded;
+                                    } else {
+                                        $featureList = array_map(
+                                            fn($key) => ucwords(str_replace('_', ' ', $key)),
+                                            array_keys(array_filter($decoded, fn($v) => $v === true))
+                                        );
+                                    }
+                                }
+                            } elseif (is_array($rawFeatures)) {
+                                if (array_is_list($rawFeatures)) {
+                                    $featureList = $rawFeatures;
+                                } else {
+                                    $featureList = array_map(
+                                        fn($key) => ucwords(str_replace('_', ' ', $key)),
+                                        array_keys(array_filter($rawFeatures, fn($v) => $v === true))
+                                    );
+                                }
+                            }
+                        @endphp
+                        @foreach($featureList as $featureName)
+                            <li class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                <svg class="h-5 w-5 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                </svg>
+                                <span>{{ $featureName }}</span>
+                            </li>
+                        @endforeach
                     @endif
                 </ul>
             </div>
             <div class="p-6 bg-gray-50 dark:bg-gray-700/50">
-                <a href="{{ route('platform.subscriptions.edit', $plan) }}" class="block w-full rounded-lg {{ $plan->slug === 'premium' ? 'bg-primary-600 hover:bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 text-gray-900 dark:text-white' }} px-4 py-2.5 text-center text-sm font-semibold transition-colors">
+                <a href="{{ route('platform.subscriptions.edit', $plan) }}" class="block w-full rounded-lg {{ $plan->slug === 'cloud-special' ? 'bg-primary-600 hover:bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 text-gray-900 dark:text-white' }} px-4 py-2.5 text-center text-sm font-semibold transition-colors">
                     Edit Paket
                 </a>
             </div>
