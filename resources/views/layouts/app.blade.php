@@ -271,7 +271,7 @@
             <div class="lg:pl-64">
                 @include('layouts.partials.header')
                 <main class="py-6">
-                    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div class="mx-auto px-4 sm:px-6 lg:px-8">
                         @if(session('success'))
                             <div class="mb-4 rounded-md bg-green-50 p-4 dark:bg-green-900/20">
                                 <div class="flex">
