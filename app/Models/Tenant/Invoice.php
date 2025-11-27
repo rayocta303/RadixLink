@@ -2,9 +2,7 @@
 
 namespace App\Models\Tenant;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Invoice extends Model
+class Invoice extends TenantModel
 {
     protected $fillable = [
         'invoice_number',

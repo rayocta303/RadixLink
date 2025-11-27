@@ -2,9 +2,7 @@
 
 namespace App\Models\Tenant;
 
-use Illuminate\Database\Eloquent\Model;
-
-class VoucherBatch extends Model
+class VoucherBatch extends TenantModel
 {
     protected $fillable = [
         'batch_id',

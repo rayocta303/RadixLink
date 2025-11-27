@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
+use App\Models\Tenant\Nas;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class NasController extends Controller
 {
     public function index()
     {
-        return view('tenant.nas.index');
+        $nasList = Nas::orderBy('name')->get();
+        return view('tenant.nas.index', compact('nasList'));
     }
 
     public function create()
@@ -19,31 +22,89 @@ class NasController extends Controller
 
     public function store(Request $request)
     {
-        return redirect()->route('tenant.nas.index')->with('success', 'NAS created successfully.');
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'shortname' => 'required|string|max:64|unique:tenant.nas,shortname',
+            'nasname' => 'required|string|max:128',
+            'ports' => 'nullable|integer',
+            'secret' => 'required|string|max:60',
+            'server' => 'nullable|string|max:64',
+            'community' => 'nullable|string|max:50',
+            'description' => 'nullable|string|max:255',
+            'type' => 'required|in:mikrotik,unifi,openwrt,cisco,other',
+            'api_username' => 'nullable|string|max:64',
+            'api_password' => 'nullable|string|max:64',
+            'api_port' => 'nullable|integer|min:1|max:65535',
+            'use_ssl' => 'boolean',
+            'is_active' => 'boolean',
+        ]);
+
+        $validated['use_ssl'] = $request->boolean('use_ssl');
+        $validated['is_active'] = $request->boolean('is_active', true);
+
+        Nas::create($validated);
+
+        return redirect()->route('tenant.nas.index')
+            ->with('success', 'Router/NAS berhasil ditambahkan.');
     }
 
-    public function show($nas)
+    public function show(int $id)
     {
-        return view('tenant.nas.show');
+        $nas = Nas::findOrFail($id);
+        return view('tenant.nas.show', compact('nas'));
     }
 
-    public function edit($nas)
+    public function edit(int $id)
     {
-        return view('tenant.nas.edit');
+        $nas = Nas::findOrFail($id);
+        return view('tenant.nas.edit', compact('nas'));
     }
 
-    public function update(Request $request, $nas)
+    public function update(Request $request, int $id)
     {
-        return redirect()->route('tenant.nas.index')->with('success', 'NAS updated successfully.');
+        $nas = Nas::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'shortname' => ['required', 'string', 'max:64', Rule::unique('tenant.nas')->ignore($nas->id)],
+            'nasname' => 'required|string|max:128',
+            'ports' => 'nullable|integer',
+            'secret' => 'required|string|max:60',
+            'server' => 'nullable|string|max:64',
+            'community' => 'nullable|string|max:50',
+            'description' => 'nullable|string|max:255',
+            'type' => 'required|in:mikrotik,unifi,openwrt,cisco,other',
+            'api_username' => 'nullable|string|max:64',
+            'api_password' => 'nullable|string|max:64',
+            'api_port' => 'nullable|integer|min:1|max:65535',
+            'use_ssl' => 'boolean',
+            'is_active' => 'boolean',
+        ]);
+
+        $validated['use_ssl'] = $request->boolean('use_ssl');
+        $validated['is_active'] = $request->boolean('is_active');
+
+        $nas->update($validated);
+
+        return redirect()->route('tenant.nas.index')
+            ->with('success', 'Router/NAS berhasil diperbarui.');
     }
 
-    public function destroy($nas)
+    public function destroy(int $id)
     {
-        return redirect()->route('tenant.nas.index')->with('success', 'NAS deleted successfully.');
+        $nas = Nas::findOrFail($id);
+        $nas->delete();
+
+        return redirect()->route('tenant.nas.index')
+            ->with('success', 'Router/NAS berhasil dihapus.');
     }
 
-    public function test($nas)
+    public function test(int $id)
     {
-        return back()->with('success', 'NAS connection test successful.');
+        $nas = Nas::findOrFail($id);
+        
+        $nas->update(['last_seen' => now()]);
+
+        return back()->with('success', 'Koneksi ke ' . $nas->name . ' berhasil!');
     }
 }

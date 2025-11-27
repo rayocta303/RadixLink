@@ -2,11 +2,11 @@
 
 namespace App\Models\Tenant;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Customer extends Authenticatable
 {
+    protected $connection = 'tenant';
     protected $fillable = [
         'username',
         'password',

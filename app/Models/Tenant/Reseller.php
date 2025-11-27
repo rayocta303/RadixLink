@@ -2,9 +2,7 @@
 
 namespace App\Models\Tenant;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Reseller extends Model
+class Reseller extends TenantModel
 {
     protected $fillable = [
         'user_id',

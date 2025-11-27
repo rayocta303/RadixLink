@@ -8,6 +8,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class TenantUser extends Authenticatable
 {
+    protected $connection = 'tenant';
     protected $table = 'users';
     
     use Notifiable, HasRoles;

@@ -2,9 +2,7 @@
 
 namespace App\Models\Tenant;
 
-use Illuminate\Database\Eloquent\Model;
-
-class TenantSetting extends Model
+class TenantSetting extends TenantModel
 {
     protected $fillable = [
         'key',

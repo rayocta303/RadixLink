@@ -2,9 +2,7 @@
 
 namespace App\Models\Tenant;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Nas extends Model
+class Nas extends TenantModel
 {
     protected $table = 'nas';
 

@@ -2,9 +2,7 @@
 
 namespace App\Models\Tenant;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Payment extends Model
+class Payment extends TenantModel
 {
     protected $fillable = [
         'payment_id',

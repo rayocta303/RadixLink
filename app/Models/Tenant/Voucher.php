@@ -2,9 +2,7 @@
 
 namespace App\Models\Tenant;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Voucher extends Model
+class Voucher extends TenantModel
 {
     protected $fillable = [
         'code',

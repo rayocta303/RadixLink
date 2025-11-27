@@ -2,9 +2,7 @@
 
 namespace App\Models\Tenant;
 
-use Illuminate\Database\Eloquent\Model;
-
-class TicketReply extends Model
+class TicketReply extends TenantModel
 {
     protected $fillable = [
         'ticket_id',

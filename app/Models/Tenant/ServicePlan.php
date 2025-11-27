@@ -2,9 +2,7 @@
 
 namespace App\Models\Tenant;
 
-use Illuminate\Database\Eloquent\Model;
-
-class ServicePlan extends Model
+class ServicePlan extends TenantModel
 {
     protected $fillable = [
         'name',

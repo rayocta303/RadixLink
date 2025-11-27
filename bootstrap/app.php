@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'platform.admin' => \App\Http\Middleware\PlatformAdminMiddleware::class,
             'tenant.user' => \App\Http\Middleware\TenantUserMiddleware::class,
+            'tenant.connection' => \App\Http\Middleware\SetTenantConnection::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
