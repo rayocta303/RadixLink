@@ -46,11 +46,50 @@ class ServicePlan extends TenantModel
 
     public function getValidityTextAttribute(): string
     {
-        return $this->validity . ' ' . ucfirst($this->validity_unit);
+        $unitLabels = [
+            'minutes' => 'menit',
+            'hours' => 'jam',
+            'days' => 'hari',
+            'months' => 'bulan',
+        ];
+        $unit = $unitLabels[$this->validity_unit ?? 'days'] ?? 'hari';
+        return $this->validity . ' ' . $unit;
     }
 
     public function getBandwidthTextAttribute(): string
     {
-        return $this->bandwidth_up . '/' . $this->bandwidth_down;
+        return ($this->bandwidth_down ?? '-') . '/' . ($this->bandwidth_up ?? '-');
+    }
+
+    public function getQuotaGbAttribute(): ?float
+    {
+        if (!$this->quota_bytes) {
+            return null;
+        }
+        return round($this->quota_bytes / 1073741824, 2);
+    }
+
+    public function getQuotaTextAttribute(): string
+    {
+        if (!$this->quota_bytes) {
+            return 'Unlimited';
+        }
+        $gb = $this->quota_gb;
+        if ($gb >= 1) {
+            return $gb . ' GB';
+        }
+        $mb = round($this->quota_bytes / 1048576, 2);
+        return $mb . ' MB';
+    }
+
+    public function getValidityInSecondsAttribute(): int
+    {
+        $multipliers = [
+            'minutes' => 60,
+            'hours' => 3600,
+            'days' => 86400,
+            'months' => 2592000,
+        ];
+        return $this->validity * ($multipliers[$this->validity_unit ?? 'days'] ?? 86400);
     }
 }

@@ -17,6 +17,7 @@ use App\Http\Controllers\Tenant\VoucherController;
 use App\Http\Controllers\Tenant\InvoiceController;
 use App\Http\Controllers\Tenant\ReportController;
 use App\Http\Controllers\Tenant\TenantSettingsController;
+use App\Http\Controllers\Tenant\RouterScriptController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -68,6 +69,7 @@ Route::middleware('auth')->group(function () {
         
         Route::resource('invoices', InvoiceController::class);
         Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
+        Route::post('invoices/{invoice}/pay', [InvoiceController::class, 'pay'])->name('invoices.pay');
         
         Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
         Route::get('reports/sales', [ReportController::class, 'sales'])->name('reports.sales');
@@ -76,5 +78,13 @@ Route::middleware('auth')->group(function () {
         
         Route::get('settings', [TenantSettingsController::class, 'index'])->name('settings');
         Route::put('settings', [TenantSettingsController::class, 'update'])->name('settings.update');
+
+        Route::prefix('router-scripts')->name('router-scripts.')->group(function () {
+            Route::get('/', [RouterScriptController::class, 'index'])->name('index');
+            Route::post('/generate', [RouterScriptController::class, 'generate'])->name('generate');
+            Route::post('/generate-customer', [RouterScriptController::class, 'generateCustomerScript'])->name('generate-customer');
+            Route::post('/generate-nas-client', [RouterScriptController::class, 'generateNasClient'])->name('generate-nas-client');
+            Route::post('/download', [RouterScriptController::class, 'download'])->name('download');
+        });
     });
 });

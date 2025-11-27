@@ -96,7 +96,7 @@ class ReportController extends Controller
             ->table('invoices')
             ->select(
                 DB::raw('DATE(paid_at) as date'),
-                DB::raw('SUM(total) as revenue'),
+                DB::raw('SUM(amount) as revenue'),
                 DB::raw('COUNT(*) as invoice_count')
             )
             ->where('status', 'paid')
@@ -120,12 +120,12 @@ class ReportController extends Controller
             'used_vouchers' => Voucher::where('status', 'used')->count(),
             'today_revenue' => Invoice::where('status', 'paid')
                 ->whereDate('paid_at', today())
-                ->sum('total'),
+                ->sum('amount'),
             'month_revenue' => Invoice::where('status', 'paid')
                 ->whereMonth('paid_at', now()->month)
                 ->whereYear('paid_at', now()->year)
-                ->sum('total'),
-            'pending_invoices' => Invoice::where('status', 'pending')->count(),
+                ->sum('amount'),
+            'pending_invoices' => Invoice::where('status', 'unpaid')->count(),
         ];
     }
 
