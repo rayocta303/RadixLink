@@ -38,49 +38,73 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
-    Route::prefix('platform')->name('platform.')->middleware('platform.admin')->group(function () {
-        Route::resource('tenants', TenantController::class);
-        Route::post('tenants/{tenant}/suspend', [TenantController::class, 'suspend'])->name('tenants.suspend');
-        Route::post('tenants/{tenant}/activate', [TenantController::class, 'activate'])->name('tenants.activate');
+    Route::prefix('platform')->name('platform.')->middleware('platform.role:super_admin,platform_admin,platform_cashier,platform_technician,platform_support')->group(function () {
+        Route::middleware('platform.role:super_admin,platform_admin')->group(function () {
+            Route::resource('tenants', TenantController::class);
+            Route::post('tenants/{tenant}/suspend', [TenantController::class, 'suspend'])->name('tenants.suspend');
+            Route::post('tenants/{tenant}/activate', [TenantController::class, 'activate'])->name('tenants.activate');
+        });
         
-        Route::resource('subscriptions', SubscriptionController::class);
-        Route::resource('invoices', PlatformInvoiceController::class);
-        Route::resource('tickets', PlatformTicketController::class);
-        Route::post('tickets/{ticket}/reply', [PlatformTicketController::class, 'reply'])->name('tickets.reply');
+        Route::middleware('platform.role:super_admin,platform_admin,platform_cashier')->group(function () {
+            Route::resource('subscriptions', SubscriptionController::class);
+            Route::resource('invoices', PlatformInvoiceController::class);
+        });
         
-        Route::resource('users', PlatformUserController::class);
-        Route::get('settings', [PlatformSettingsController::class, 'index'])->name('settings');
-        Route::put('settings', [PlatformSettingsController::class, 'update'])->name('settings.update');
+        Route::middleware('platform.role:super_admin,platform_admin,platform_support')->group(function () {
+            Route::resource('tickets', PlatformTicketController::class);
+            Route::post('tickets/{ticket}/reply', [PlatformTicketController::class, 'reply'])->name('tickets.reply');
+        });
+        
+        Route::middleware('platform.role:super_admin,platform_admin')->group(function () {
+            Route::resource('users', PlatformUserController::class);
+            Route::get('settings', [PlatformSettingsController::class, 'index'])->name('settings');
+            Route::put('settings', [PlatformSettingsController::class, 'update'])->name('settings.update');
+        });
     });
 
-    Route::prefix('tenant')->name('tenant.')->middleware('tenant.user')->group(function () {
-        Route::resource('nas', NasController::class);
-        Route::post('nas/{nas}/test', [NasController::class, 'test'])->name('nas.test');
-        Route::get('nas-map', [NasController::class, 'map'])->name('nas.map');
+    Route::prefix('tenant')->name('tenant.')->middleware('tenant.role:owner,admin,technician,cashier,support,reseller,investor')->group(function () {
+        Route::middleware('tenant.role:owner,admin,technician')->group(function () {
+            Route::resource('nas', NasController::class);
+            Route::post('nas/{nas}/test', [NasController::class, 'test'])->name('nas.test');
+            Route::get('nas-map', [NasController::class, 'map'])->name('nas.map');
+        });
         
-        Route::resource('services', ServicePlanController::class);
-        Route::resource('customers', CustomerController::class);
-        Route::post('customers/{customer}/suspend', [CustomerController::class, 'suspend'])->name('customers.suspend');
-        Route::post('customers/{customer}/activate', [CustomerController::class, 'activate'])->name('customers.activate');
+        Route::middleware('tenant.role:owner,admin')->group(function () {
+            Route::resource('services', ServicePlanController::class);
+        });
         
-        Route::resource('vouchers', VoucherController::class);
-        Route::get('vouchers/generate', [VoucherController::class, 'showGenerate'])->name('vouchers.generate');
-        Route::post('vouchers/generate', [VoucherController::class, 'generate'])->name('vouchers.generate.store');
-        Route::get('vouchers/print/{batch}', [VoucherController::class, 'print'])->name('vouchers.print');
+        Route::middleware('tenant.role:owner,admin,reseller')->group(function () {
+            Route::resource('customers', CustomerController::class);
+            Route::post('customers/{customer}/suspend', [CustomerController::class, 'suspend'])->name('customers.suspend');
+            Route::post('customers/{customer}/activate', [CustomerController::class, 'activate'])->name('customers.activate');
+        });
         
-        Route::resource('invoices', InvoiceController::class);
-        Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
-        Route::post('invoices/{invoice}/pay', [InvoiceController::class, 'pay'])->name('invoices.pay');
+        Route::middleware('tenant.role:owner,admin,cashier,reseller')->group(function () {
+            Route::resource('vouchers', VoucherController::class);
+            Route::get('vouchers/generate', [VoucherController::class, 'showGenerate'])->name('vouchers.generate');
+            Route::post('vouchers/generate', [VoucherController::class, 'generate'])->name('vouchers.generate.store');
+            Route::get('vouchers/print/{batch}', [VoucherController::class, 'print'])->name('vouchers.print');
+        });
         
-        Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
-        Route::get('reports/sales', [ReportController::class, 'sales'])->name('reports.sales');
-        Route::get('reports/customers', [ReportController::class, 'customers'])->name('reports.customers');
-        Route::get('reports/revenue', [ReportController::class, 'revenue'])->name('reports.revenue');
+        Route::middleware('tenant.role:owner,admin,cashier')->group(function () {
+            Route::resource('invoices', InvoiceController::class);
+            Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
+            Route::post('invoices/{invoice}/pay', [InvoiceController::class, 'pay'])->name('invoices.pay');
+        });
         
-        Route::get('settings', [TenantSettingsController::class, 'index'])->name('settings');
-        Route::put('settings', [TenantSettingsController::class, 'update'])->name('settings.update');
+        Route::middleware('tenant.role:owner,admin,cashier,investor')->group(function () {
+            Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+            Route::get('reports/sales', [ReportController::class, 'sales'])->name('reports.sales');
+            Route::get('reports/customers', [ReportController::class, 'customers'])->name('reports.customers');
+            Route::get('reports/revenue', [ReportController::class, 'revenue'])->name('reports.revenue');
+        });
+        
+        Route::middleware('tenant.role:owner,admin')->group(function () {
+            Route::get('settings', [TenantSettingsController::class, 'index'])->name('settings');
+            Route::put('settings', [TenantSettingsController::class, 'update'])->name('settings.update');
+        });
 
-        Route::prefix('router-scripts')->name('router-scripts.')->group(function () {
+        Route::middleware('tenant.role:owner,admin,technician')->prefix('router-scripts')->name('router-scripts.')->group(function () {
             Route::get('/', [RouterScriptController::class, 'index'])->name('index');
             Route::post('/generate', [RouterScriptController::class, 'generate'])->name('generate');
             Route::post('/generate-customer', [RouterScriptController::class, 'generateCustomerScript'])->name('generate-customer');

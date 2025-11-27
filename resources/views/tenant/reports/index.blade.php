@@ -212,10 +212,16 @@ $(document).ready(function() {
         pageLength: 10
     });
 
+    @php
+        $chartRevenueData = $revenueData ?? [450000, 520000, 610000, 580000, 720000, 850000];
+        $chartRevenueLabels = $revenueLabels ?? ['Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        $chartCustomerDist = $customerDistribution ?? [65, 35];
+    @endphp
+
     var revenueOptions = {
         series: [{
             name: 'Pendapatan',
-            data: @json($revenueData ?? [450000, 520000, 610000, 580000, 720000, 850000])
+            data: {!! json_encode($chartRevenueData) !!}
         }],
         chart: {
             type: 'area',
@@ -235,7 +241,7 @@ $(document).ready(function() {
             }
         },
         xaxis: {
-            categories: @json($revenueLabels ?? ['Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'])
+            categories: {!! json_encode($chartRevenueLabels) !!}
         },
         yaxis: {
             labels: {
@@ -257,7 +263,7 @@ $(document).ready(function() {
     };
 
     var customerOptions = {
-        series: @json($customerDistribution ?? [65, 35]),
+        series: {!! json_encode($chartCustomerDist) !!},
         chart: {
             type: 'donut',
             height: 250,

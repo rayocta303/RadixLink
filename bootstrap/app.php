@@ -17,7 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
         
         $middleware->alias([
             'platform.admin' => \App\Http\Middleware\PlatformAdminMiddleware::class,
+            'platform.role' => \App\Http\Middleware\CheckPlatformRole::class,
             'tenant.user' => \App\Http\Middleware\TenantUserMiddleware::class,
+            'tenant.role' => \App\Http\Middleware\CheckTenantRole::class,
             'tenant.connection' => \App\Http\Middleware\SetTenantConnection::class,
         ]);
     })

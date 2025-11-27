@@ -64,6 +64,51 @@ class User extends Authenticatable
         return $this->hasRole('platform_admin');
     }
 
+    public function isPlatformCashier(): bool
+    {
+        return $this->hasRole('platform_cashier');
+    }
+
+    public function isPlatformTechnician(): bool
+    {
+        return $this->hasRole('platform_technician');
+    }
+
+    public function isPlatformSupport(): bool
+    {
+        return $this->hasRole('platform_support');
+    }
+
+    public function hasPlatformRole(string|array $roles): bool
+    {
+        return $this->hasRole($roles);
+    }
+
+    public function hasAnyPlatformRole(array $roles): bool
+    {
+        return $this->hasAnyRole($roles);
+    }
+
+    public function canManageTenants(): bool
+    {
+        return $this->hasAnyRole(['super_admin', 'platform_admin']);
+    }
+
+    public function canManageBilling(): bool
+    {
+        return $this->hasAnyRole(['super_admin', 'platform_admin', 'platform_cashier']);
+    }
+
+    public function canManageTickets(): bool
+    {
+        return $this->hasAnyRole(['super_admin', 'platform_admin', 'platform_support']);
+    }
+
+    public function canMonitorServers(): bool
+    {
+        return $this->hasAnyRole(['super_admin', 'platform_technician']);
+    }
+
     public function updateLastLogin(): void
     {
         $this->update([
