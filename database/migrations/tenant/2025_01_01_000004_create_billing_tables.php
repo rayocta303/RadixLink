@@ -13,12 +13,12 @@ return new class extends Migration
             $table->string('invoice_number')->unique();
             $table->foreignId('customer_id')->constrained('customers');
             $table->foreignId('service_plan_id')->nullable()->constrained('service_plans');
-            $table->enum('type', ['subscription', 'voucher', 'addon', 'manual'])->default('subscription');
+            $table->string('type')->default('subscription');
             $table->decimal('subtotal', 12, 2);
             $table->decimal('tax', 12, 2)->default(0);
             $table->decimal('discount', 12, 2)->default(0);
             $table->decimal('total', 12, 2);
-            $table->enum('status', ['draft', 'pending', 'paid', 'overdue', 'cancelled', 'refunded'])->default('pending');
+            $table->string('status')->default('pending');
             $table->date('issue_date');
             $table->date('due_date');
             $table->timestamp('paid_at')->nullable();
@@ -38,7 +38,7 @@ return new class extends Migration
             $table->decimal('amount', 12, 2);
             $table->string('payment_method');
             $table->string('payment_channel')->nullable();
-            $table->enum('status', ['pending', 'processing', 'success', 'failed', 'expired', 'refunded'])->default('pending');
+            $table->string('status')->default('pending');
             $table->string('external_id')->nullable();
             $table->string('payment_url')->nullable();
             $table->json('payment_data')->nullable();
@@ -55,7 +55,7 @@ return new class extends Migration
             $table->foreignId('voucher_id')->nullable()->constrained('vouchers');
             $table->foreignId('invoice_id')->nullable()->constrained('invoices');
             $table->foreignId('payment_id')->nullable()->constrained('payments');
-            $table->enum('type', ['income', 'expense', 'refund', 'topup', 'withdrawal'])->default('income');
+            $table->string('type')->default('income');
             $table->string('category')->nullable();
             $table->decimal('amount', 12, 2);
             $table->decimal('balance_before', 12, 2)->default(0);
@@ -84,7 +84,7 @@ return new class extends Migration
         Schema::create('reseller_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('reseller_id')->constrained('resellers');
-            $table->enum('type', ['topup', 'sale', 'commission', 'withdrawal'])->default('sale');
+            $table->string('type')->default('sale');
             $table->decimal('amount', 12, 2);
             $table->decimal('balance_before', 12, 2)->default(0);
             $table->decimal('balance_after', 12, 2)->default(0);

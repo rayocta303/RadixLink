@@ -50,3 +50,35 @@ The platform employs a multi-tenant architecture where each ISP (tenant) operate
 - **Leaflet.js:** Used for displaying NAS device locations on geographical maps.
 - **barryvdh/laravel-dompdf:** For PDF generation (e.g., invoices).
 - **maatwebsite/excel:** For exporting data to Excel format.
+
+## Recent Changes (November 27, 2025)
+
+### Database Migrations
+- Removed duplicate `activity_logs` table from central database migration
+- Changed all enum types to string types for better database compatibility
+- Platform activity logs now use `platform_activity_logs` table
+- Tenant activity logs use `activity_logs` table in tenant databases
+
+### Subscription Plans
+Available subscription plans (from SubscriptionPlanSeeder):
+1. **Free (Trial)** - slug: `free` - Rp 0
+2. **Starter** - slug: `starter` - Rp 99.000/bulan
+3. **Basic** - slug: `basic` - Rp 199.000/bulan
+4. **Professional** - slug: `professional` - Rp 399.000/bulan
+5. **Business** - slug: `business` - Rp 799.000/bulan
+6. **Enterprise** - slug: `enterprise` - Rp 1.499.000/bulan
+7. **Platinum (Unlimited)** - slug: `platinum` - Rp 2.999.000/bulan
+
+### Platform Roles
+- `super_admin` - Full access to all platform features
+- `platform_admin` - Manage tenants, subscriptions, tickets
+- `platform_cashier` - Manage billing and invoices
+- `platform_technician` - Server and RADIUS monitoring
+- `platform_support` - Handle support tickets
+
+### Default Login Credentials
+- **Super Admin**: admin@ispmanager.id / admin123
+- **Platform Admin**: platform@ispmanager.id / admin123
+- **Support Staff**: support@ispmanager.id / support123
+- **Cashier Staff**: cashier@ispmanager.id / cashier123
+- **Technician Staff**: technician@ispmanager.id / technician123

@@ -15,104 +15,9 @@ class DummyDataSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->seedSubscriptionPlans();
         $this->seedPlatformUsers();
         $this->seedPlatformInvoices();
         $this->seedPlatformTickets();
-    }
-
-    protected function seedSubscriptionPlans(): void
-    {
-        $plans = [
-            [
-                'name' => 'Basic',
-                'slug' => 'basic',
-                'description' => 'Untuk ISP kecil dengan kebutuhan dasar',
-                'price_monthly' => 150000,
-                'price_yearly' => 1500000,
-                'max_routers' => 3,
-                'max_users' => 500,
-                'max_vouchers' => 5000,
-                'features' => json_encode([
-                    'basic_reports' => true,
-                    'email_support' => true,
-                    'api_access' => false,
-                    'custom_branding' => false,
-                    'priority_support' => false,
-                ]),
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Standard',
-                'slug' => 'standard',
-                'description' => 'Untuk ISP menengah dengan fitur lengkap',
-                'price_monthly' => 350000,
-                'price_yearly' => 3500000,
-                'max_routers' => 10,
-                'max_users' => 2000,
-                'max_vouchers' => 20000,
-                'features' => json_encode([
-                    'basic_reports' => true,
-                    'advanced_reports' => true,
-                    'email_support' => true,
-                    'phone_support' => true,
-                    'api_access' => true,
-                    'custom_branding' => false,
-                    'priority_support' => false,
-                ]),
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Premium',
-                'slug' => 'premium',
-                'description' => 'Untuk ISP besar dengan semua fitur',
-                'price_monthly' => 750000,
-                'price_yearly' => 7500000,
-                'max_routers' => 50,
-                'max_users' => 10000,
-                'max_vouchers' => 100000,
-                'features' => json_encode([
-                    'basic_reports' => true,
-                    'advanced_reports' => true,
-                    'email_support' => true,
-                    'phone_support' => true,
-                    'api_access' => true,
-                    'custom_branding' => true,
-                    'priority_support' => true,
-                    'dedicated_manager' => true,
-                    'sla_guarantee' => true,
-                ]),
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Enterprise',
-                'slug' => 'enterprise',
-                'description' => 'Solusi kustom untuk perusahaan besar',
-                'price_monthly' => 1500000,
-                'price_yearly' => 15000000,
-                'max_routers' => 999,
-                'max_users' => 999999,
-                'max_vouchers' => 999999,
-                'features' => json_encode([
-                    'unlimited' => true,
-                    'all_features' => true,
-                    'priority_support' => true,
-                    'dedicated_manager' => true,
-                    'custom_development' => true,
-                    'on_premise_option' => true,
-                ]),
-                'is_active' => true,
-            ],
-        ];
-
-        foreach ($plans as $plan) {
-            SubscriptionPlan::updateOrCreate(
-                ['slug' => $plan['slug']],
-                $plan
-            );
-        }
-
-        $this->command->info('Subscription plans seeded successfully.');
     }
 
     protected function seedPlatformUsers(): void
@@ -125,6 +30,7 @@ class DummyDataSeeder extends Seeder
                 'email_verified_at' => now(),
                 'user_type' => 'platform',
                 'is_active' => true,
+                'role' => 'platform_admin',
             ],
             [
                 'name' => 'Support Staff',
@@ -133,27 +39,39 @@ class DummyDataSeeder extends Seeder
                 'email_verified_at' => now(),
                 'user_type' => 'platform',
                 'is_active' => true,
+                'role' => 'platform_support',
             ],
             [
-                'name' => 'Marketing Team',
-                'email' => 'marketing@ispmanager.id',
-                'password' => Hash::make('marketing123'),
+                'name' => 'Cashier Staff',
+                'email' => 'cashier@ispmanager.id',
+                'password' => Hash::make('cashier123'),
                 'email_verified_at' => now(),
                 'user_type' => 'platform',
                 'is_active' => true,
+                'role' => 'platform_cashier',
+            ],
+            [
+                'name' => 'Technician Staff',
+                'email' => 'technician@ispmanager.id',
+                'password' => Hash::make('technician123'),
+                'email_verified_at' => now(),
+                'user_type' => 'platform',
+                'is_active' => true,
+                'role' => 'platform_technician',
             ],
         ];
 
         foreach ($users as $userData) {
+            $role = $userData['role'];
+            unset($userData['role']);
+            
             $user = User::firstOrCreate(
                 ['email' => $userData['email']],
                 $userData
             );
 
-            if ($userData['email'] === 'platform@ispmanager.id') {
-                $user->assignRole('platform_admin');
-            } elseif ($userData['email'] === 'support@ispmanager.id') {
-                $user->assignRole('platform_support');
+            if (!$user->hasRole($role)) {
+                $user->assignRole($role);
             }
         }
 
@@ -164,17 +82,19 @@ class DummyDataSeeder extends Seeder
     {
         $tenants = Tenant::all();
         
+        if ($tenants->isEmpty()) {
+            $this->command->info('No tenants found, skipping platform invoices seeding.');
+            return;
+        }
+
         foreach ($tenants as $tenant) {
+            $plan = SubscriptionPlan::where('slug', $tenant->subscription_plan)->first();
+            $price = $plan ? $plan->price_monthly : 150000;
+
             for ($i = 0; $i < 3; $i++) {
                 $issueDate = now()->subMonths($i);
                 $dueDate = $issueDate->copy()->addDays(14);
                 $status = $i === 0 ? 'pending' : ($i === 1 ? 'paid' : 'overdue');
-                
-                $price = match($tenant->subscription_plan) {
-                    'premium' => 750000,
-                    'standard' => 350000,
-                    default => 150000,
-                };
 
                 PlatformInvoice::updateOrCreate(
                     [
@@ -204,6 +124,11 @@ class DummyDataSeeder extends Seeder
     {
         $tenants = Tenant::all();
         
+        if ($tenants->isEmpty()) {
+            $this->command->info('No tenants found, skipping platform tickets seeding.');
+            return;
+        }
+
         $ticketSubjects = [
             ['Tidak bisa login ke dashboard', 'urgent', 'open'],
             ['Request penambahan kuota router', 'medium', 'in_progress'],

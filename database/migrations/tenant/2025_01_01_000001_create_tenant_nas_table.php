@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('server')->nullable();
             $table->string('community')->nullable();
             $table->string('description')->nullable();
-            $table->enum('type', ['mikrotik', 'unifi', 'openwrt', 'cisco', 'other'])->default('mikrotik');
+            $table->string('type')->default('mikrotik');
             
             $table->string('location_name')->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
@@ -31,12 +31,12 @@ return new class extends Migration
             $table->integer('winbox_port')->default(8291);
             $table->boolean('use_ssl')->default(false);
             $table->boolean('is_active')->default(true);
-            $table->enum('status', ['enabled', 'disabled'])->default('enabled');
+            $table->string('status')->default('enabled');
             
             $table->boolean('vpn_enabled')->default(false);
             $table->string('vpn_secret')->nullable();
             $table->integer('vpn_port')->default(1701);
-            $table->enum('vpn_type', ['l2tp', 'pptp', 'sstp', 'ovpn', 'wireguard'])->nullable();
+            $table->string('vpn_type')->nullable();
             $table->string('vpn_server')->nullable();
             $table->string('vpn_username')->nullable();
             $table->string('vpn_password')->nullable();
@@ -53,10 +53,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('code')->unique();
             $table->text('description')->nullable();
-            $table->enum('type', ['hotspot', 'pppoe', 'dhcp', 'hybrid'])->default('hotspot');
+            $table->string('type')->default('hotspot');
             $table->decimal('price', 12, 2)->default(0);
             $table->integer('validity')->default(30);
-            $table->enum('validity_unit', ['minutes', 'hours', 'days', 'months'])->default('days');
+            $table->string('validity_unit')->default('days');
             $table->string('bandwidth_up')->nullable();
             $table->string('bandwidth_down')->nullable();
             $table->bigInteger('quota_bytes')->nullable();

@@ -90,8 +90,8 @@ return new class extends Migration
             $table->string('ticket_number')->unique();
             $table->string('subject');
             $table->text('message');
-            $table->enum('priority', ['low', 'medium', 'high', 'urgent'])->default('medium');
-            $table->enum('status', ['open', 'in_progress', 'waiting', 'resolved', 'closed'])->default('open');
+            $table->string('priority')->default('medium');
+            $table->string('status')->default('open');
             $table->string('category')->nullable();
             $table->foreignId('assigned_to')->nullable()->constrained('users');
             $table->timestamp('resolved_at')->nullable();

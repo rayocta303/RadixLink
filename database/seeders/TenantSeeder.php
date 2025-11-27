@@ -28,7 +28,7 @@ class TenantSeeder extends Seeder
                 'email' => 'ahmad@wijayanet.id',
                 'phone' => '081234567890',
                 'address' => 'Jl. Merdeka No. 123, Jakarta Selatan',
-                'subscription_plan' => 'premium',
+                'subscription_plan' => 'business',
             ],
             [
                 'name' => 'Budi Santoso',
@@ -37,7 +37,7 @@ class TenantSeeder extends Seeder
                 'email' => 'budi@santosoint.com',
                 'phone' => '082345678901',
                 'address' => 'Jl. Pahlawan No. 45, Surabaya',
-                'subscription_plan' => 'standard',
+                'subscription_plan' => 'professional',
             ],
             [
                 'name' => 'Citra Dewi',
@@ -70,7 +70,13 @@ class TenantSeeder extends Seeder
             $dbCredentials = $this->setupTenantDatabase($data['subdomain']);
         }
 
-        $planLimits = $this->getPlanLimits($data['subscription_plan']);
+        $plan = SubscriptionPlan::where('slug', $data['subscription_plan'])->first();
+        $planLimits = $plan ? [
+            'max_routers' => $plan->max_routers,
+            'max_users' => $plan->max_users,
+            'max_vouchers' => $plan->max_vouchers,
+            'max_online_users' => $plan->max_online_users,
+        ] : $this->getDefaultPlanLimits($data['subscription_plan']);
 
         $tenant = Tenant::create([
             'id' => $tenantId,
@@ -110,7 +116,6 @@ class TenantSeeder extends Seeder
 
         $ownerUser->assignRole('tenant_owner');
 
-        $plan = SubscriptionPlan::where('slug', $data['subscription_plan'])->first();
         if ($plan) {
             TenantSubscription::create([
                 'tenant_id' => $tenant->id,
@@ -327,13 +332,15 @@ class TenantSeeder extends Seeder
         }
     }
 
-    protected function getPlanLimits(string $plan): array
+    protected function getDefaultPlanLimits(string $plan): array
     {
         return match($plan) {
-            'enterprise' => ['max_routers' => 999, 'max_users' => 999999, 'max_vouchers' => 999999, 'max_online_users' => 999],
-            'premium' => ['max_routers' => 50, 'max_users' => 10000, 'max_vouchers' => 100000, 'max_online_users' => 500],
-            'standard' => ['max_routers' => 10, 'max_users' => 2000, 'max_vouchers' => 20000, 'max_online_users' => 100],
-            default => ['max_routers' => 3, 'max_users' => 500, 'max_vouchers' => 5000, 'max_online_users' => 25],
+            'platinum', 'enterprise' => ['max_routers' => 999, 'max_users' => 99999, 'max_vouchers' => 999999, 'max_online_users' => 9999],
+            'business' => ['max_routers' => 50, 'max_users' => 5000, 'max_vouchers' => 50000, 'max_online_users' => 1000],
+            'professional' => ['max_routers' => 15, 'max_users' => 1000, 'max_vouchers' => 10000, 'max_online_users' => 200],
+            'basic' => ['max_routers' => 5, 'max_users' => 250, 'max_vouchers' => 2500, 'max_online_users' => 50],
+            'starter' => ['max_routers' => 2, 'max_users' => 100, 'max_vouchers' => 500, 'max_online_users' => 25],
+            default => ['max_routers' => 1, 'max_users' => 25, 'max_vouchers' => 50, 'max_online_users' => 5],
         };
     }
 }

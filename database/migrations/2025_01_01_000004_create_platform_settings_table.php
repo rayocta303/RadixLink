@@ -25,8 +25,8 @@ return new class extends Migration
             $table->string('ticket_number')->unique();
             $table->string('subject');
             $table->text('message');
-            $table->enum('priority', ['low', 'medium', 'high', 'urgent'])->default('medium');
-            $table->enum('status', ['open', 'in_progress', 'waiting', 'resolved', 'closed'])->default('open');
+            $table->string('priority')->default('medium');
+            $table->string('status')->default('open');
             $table->string('category')->nullable();
             $table->foreignId('assigned_to')->nullable()->constrained('users');
             $table->timestamp('resolved_at')->nullable();
@@ -53,7 +53,7 @@ return new class extends Migration
             $table->decimal('tax', 12, 2)->default(0);
             $table->decimal('discount', 12, 2)->default(0);
             $table->decimal('total', 12, 2);
-            $table->enum('status', ['draft', 'pending', 'paid', 'overdue', 'cancelled'])->default('pending');
+            $table->string('status')->default('pending');
             $table->date('issue_date');
             $table->date('due_date');
             $table->timestamp('paid_at')->nullable();
@@ -65,29 +65,10 @@ return new class extends Migration
             
             $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
         });
-
-        Schema::create('activity_logs', function (Blueprint $table) {
-            $table->id();
-            $table->string('tenant_id')->nullable();
-            $table->foreignId('user_id')->nullable()->constrained('users');
-            $table->string('log_type');
-            $table->string('subject_type')->nullable();
-            $table->unsignedBigInteger('subject_id')->nullable();
-            $table->string('action');
-            $table->text('description')->nullable();
-            $table->json('properties')->nullable();
-            $table->string('ip_address')->nullable();
-            $table->string('user_agent')->nullable();
-            $table->timestamps();
-            
-            $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
-            $table->index(['subject_type', 'subject_id']);
-        });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('activity_logs');
         Schema::dropIfExists('platform_invoices');
         Schema::dropIfExists('platform_ticket_replies');
         Schema::dropIfExists('platform_tickets');

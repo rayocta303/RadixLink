@@ -32,12 +32,12 @@ return new class extends Migration
             $table->id();
             $table->string('tenant_id');
             $table->foreignId('plan_id')->constrained('subscription_plans');
-            $table->enum('billing_cycle', ['monthly', 'yearly'])->default('monthly');
+            $table->string('billing_cycle')->default('monthly');
             $table->decimal('amount', 12, 2);
             $table->timestamp('starts_at');
             $table->timestamp('ends_at')->nullable();
             $table->timestamp('cancelled_at')->nullable();
-            $table->enum('status', ['active', 'cancelled', 'expired', 'suspended'])->default('active');
+            $table->string('status')->default('active');
             $table->string('payment_method')->nullable();
             $table->timestamps();
             

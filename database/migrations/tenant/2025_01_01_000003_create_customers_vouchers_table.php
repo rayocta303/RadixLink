@@ -18,8 +18,8 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->string('coordinates')->nullable();
             $table->foreignId('service_plan_id')->nullable()->constrained('service_plans');
-            $table->enum('service_type', ['hotspot', 'pppoe', 'dhcp', 'hybrid'])->default('hotspot');
-            $table->enum('status', ['active', 'suspended', 'expired', 'disabled'])->default('active');
+            $table->string('service_type')->default('hotspot');
+            $table->string('status')->default('active');
             $table->timestamp('registered_at')->useCurrent();
             $table->timestamp('expires_at')->nullable();
             $table->timestamp('suspended_at')->nullable();
@@ -40,8 +40,8 @@ return new class extends Migration
             $table->string('username', 64)->nullable();
             $table->string('password', 64)->nullable();
             $table->foreignId('service_plan_id')->constrained('service_plans');
-            $table->enum('status', ['unused', 'used', 'expired', 'disabled'])->default('unused');
-            $table->enum('type', ['single', 'multi'])->default('single');
+            $table->string('status')->default('unused');
+            $table->string('type')->default('single');
             $table->integer('max_usage')->default(1);
             $table->integer('used_count')->default(0);
             $table->decimal('price', 12, 2)->default(0);
@@ -68,7 +68,7 @@ return new class extends Migration
             $table->text('html_template');
             $table->text('css_styles')->nullable();
             $table->integer('paper_size')->default(4);
-            $table->enum('orientation', ['portrait', 'landscape'])->default('portrait');
+            $table->string('orientation')->default('portrait');
             $table->integer('vouchers_per_page')->default(1);
             $table->integer('columns_per_row')->default(3);
             $table->boolean('show_qr_code')->default(true);
@@ -86,7 +86,7 @@ return new class extends Migration
             $table->integer('used_count')->default(0);
             $table->string('prefix')->nullable();
             $table->integer('code_length')->default(8);
-            $table->enum('code_type', ['numeric', 'alpha', 'alphanumeric'])->default('alphanumeric');
+            $table->string('code_type')->default('alphanumeric');
             $table->text('notes')->nullable();
             $table->foreignId('created_by')->nullable();
             $table->timestamps();
