@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Tenant;
+use App\Services\TenantProvisioningService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -53,40 +54,37 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
-        $tenantId = Str::slug($validated['subdomain']);
-        
-        $tenant = Tenant::create([
-            'id' => $tenantId,
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
-            'company_name' => $validated['company_name'],
-            'subdomain' => $validated['subdomain'],
-            'subscription_plan' => 'basic',
-            'subscription_expires_at' => now()->addDays(14),
-            'is_active' => true,
-            'max_routers' => 1,
-            'max_users' => 50,
-            'max_vouchers' => 100,
-            'max_online_users' => 10,
-        ]);
+        try {
+            $provisioningService = new TenantProvisioningService();
+            $tenant = $provisioningService->provision([
+                'name' => $validated['name'],
+                'company_name' => $validated['company_name'],
+                'subdomain' => $validated['subdomain'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'] ?? null,
+                'password' => $validated['password'],
+                'subscription_plan' => 'free',
+            ]);
 
-        $user = User::create([
-            'tenant_id' => $tenant->id,
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
-            'password' => Hash::make($validated['password']),
-            'user_type' => 'tenant',
-            'is_active' => true,
-        ]);
+            if (!$tenant) {
+                return back()->withErrors([
+                    'subdomain' => 'Failed to create tenant. Please try again.',
+                ])->withInput();
+            }
 
-        $user->assignRole('owner');
+            $user = User::where('email', $validated['email'])->first();
+            
+            if ($user) {
+                Auth::login($user);
+                $user->updateLastLogin();
+            }
 
-        Auth::login($user);
-        $user->updateLastLogin();
-
-        return redirect()->route('dashboard')->with('success', 'Registration successful! Welcome to ISP Manager.');
+            return redirect()->route('dashboard')->with('success', 'Registration successful! Welcome to ISP Manager.');
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'subdomain' => 'Registration failed: ' . $e->getMessage(),
+            ])->withInput();
+        }
     }
 
     public function logout(Request $request)

@@ -171,7 +171,7 @@
                             @endif
                         </td>
                         <td>{{ $tenant->created_at?->format('d M Y') ?? '-' }}</td>
-                        <td>{{ $tenant->trial_ends_at?->format('d M Y') ?? '-' }}</td>
+                        <td>{{ $tenant->subscription_expires_at?->format('d M Y') ?? '-' }}</td>
                         <td>
                             <a href="{{ route('platform.tenants.edit', $tenant) }}" class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300" title="Kelola">
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">

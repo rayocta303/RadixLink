@@ -86,14 +86,14 @@
                         <div class="flex-shrink-0">
                             <div class="h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
                                 <svg class="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                 </svg>
                             </div>
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Masa Trial</dt>
-                                <dd class="text-2xl font-bold text-purple-600 dark:text-purple-400" id="trialTenants">{{ $tenantStats['trial'] }}</dd>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Baru Bulan Ini</dt>
+                                <dd class="text-2xl font-bold text-purple-600 dark:text-purple-400" id="newThisMonth">{{ $tenantStats['newThisMonth'] }}</dd>
                             </dl>
                         </div>
                     </div>
@@ -397,7 +397,7 @@
         document.getElementById('totalTenants').textContent = data.tenantStats.total;
         document.getElementById('activeTenants').textContent = data.tenantStats.active;
         document.getElementById('suspendedTenants').textContent = data.tenantStats.suspended;
-        document.getElementById('trialTenants').textContent = data.tenantStats.trial;
+        document.getElementById('newThisMonth').textContent = data.tenantStats.newThisMonth;
         document.getElementById('expiringTenants').textContent = data.tenantStats.expiringThisMonth;
 
         document.getElementById('revenueThisMonth').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(data.subscriptionStats.revenueThisMonth);

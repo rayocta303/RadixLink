@@ -49,9 +49,12 @@ class TenantProvisioningService
                 'max_users' => $planLimits['max_users'],
                 'max_vouchers' => $planLimits['max_vouchers'],
                 'max_online_users' => $planLimits['max_online_users'],
-                'trial_ends_at' => now()->addDays(14),
                 'is_active' => true,
                 'is_suspended' => false,
+                'tenancy_db_name' => $dbCredentials['tenancy_db_name'] ?? null,
+                'tenancy_db_username' => $dbCredentials['tenancy_db_username'] ?? null,
+                'tenancy_db_password' => $dbCredentials['tenancy_db_password'] ?? null,
+                'tenancy_db_host' => $dbCredentials['tenancy_db_host'] ?? null,
                 'data' => $dbCredentials,
             ]);
 
@@ -341,10 +344,14 @@ class TenantProvisioningService
     protected function getPlanLimits(string $plan): array
     {
         return match ($plan) {
-            'enterprise' => ['max_routers' => 999, 'max_users' => 999999, 'max_vouchers' => 999999, 'max_online_users' => 999],
-            'premium' => ['max_routers' => 50, 'max_users' => 10000, 'max_vouchers' => 100000, 'max_online_users' => 500],
-            'standard' => ['max_routers' => 10, 'max_users' => 2000, 'max_vouchers' => 20000, 'max_online_users' => 100],
-            default => ['max_routers' => 3, 'max_users' => 500, 'max_vouchers' => 5000, 'max_online_users' => 25],
+            'platinum' => ['max_routers' => 999, 'max_users' => 999999, 'max_vouchers' => 999999, 'max_online_users' => 999],
+            'enterprise' => ['max_routers' => 100, 'max_users' => 50000, 'max_vouchers' => 500000, 'max_online_users' => 500],
+            'business' => ['max_routers' => 50, 'max_users' => 10000, 'max_vouchers' => 100000, 'max_online_users' => 250],
+            'professional' => ['max_routers' => 25, 'max_users' => 5000, 'max_vouchers' => 50000, 'max_online_users' => 150],
+            'basic' => ['max_routers' => 10, 'max_users' => 2000, 'max_vouchers' => 20000, 'max_online_users' => 100],
+            'starter' => ['max_routers' => 5, 'max_users' => 1000, 'max_vouchers' => 10000, 'max_online_users' => 50],
+            'free' => ['max_routers' => 1, 'max_users' => 50, 'max_vouchers' => 100, 'max_online_users' => 10],
+            default => ['max_routers' => 1, 'max_users' => 50, 'max_vouchers' => 100, 'max_online_users' => 10],
         };
     }
 

@@ -11,9 +11,9 @@ class SubscriptionPlanSeeder extends Seeder
     {
         $plans = [
             [
-                'name' => 'Free (Trial)',
+                'name' => 'Free',
                 'slug' => 'free',
-                'description' => 'Paket trial gratis untuk memulai. Cocok untuk ISP yang ingin mencoba layanan kami.',
+                'description' => 'Paket gratis untuk memulai. Cocok untuk ISP yang ingin mencoba layanan kami.',
                 'price_monthly' => 0,
                 'price_yearly' => 0,
                 'max_routers' => 1,
@@ -281,7 +281,7 @@ class SubscriptionPlanSeeder extends Seeder
         }
 
         $this->command->info('7 subscription plans seeded successfully:');
-        $this->command->line('  1. Free (Trial) - Rp 0');
+        $this->command->line('  1. Free - Rp 0');
         $this->command->line('  2. Starter - Rp 99.000/bulan');
         $this->command->line('  3. Basic - Rp 199.000/bulan');
         $this->command->line('  4. Professional - Rp 399.000/bulan');

@@ -6,7 +6,7 @@ use App\Models\Tenant;
 use App\Models\TenantSubscription;
 use App\Models\PlatformTicket;
 use App\Models\PlatformInvoice;
-use App\Models\ActivityLog;
+use App\Models\PlatformActivityLog;
 use App\Models\Tenant\Customer;
 use App\Models\Tenant\Voucher;
 use App\Models\Tenant\Invoice;
@@ -29,8 +29,7 @@ class DashboardController extends Controller
 
         if ($user->isPlatformUser()) {
             $stats = $this->getPlatformStats();
-            $activities = ActivityLog::with('user')
-                ->whereNull('tenant_id')
+            $activities = PlatformActivityLog::with('user')
                 ->latest()
                 ->limit(10)
                 ->get();
@@ -99,7 +98,7 @@ class DashboardController extends Controller
         $subscription = $tenant->subscription;
         
         return [
-            'plan_name' => $plan ? $plan->name : 'Free (Trial)',
+            'plan_name' => $plan ? $plan->name : 'Free',
             'plan_slug' => $plan ? $plan->slug : 'free',
             'expires_at' => $tenant->subscription_expires_at,
             'is_expired' => $tenant->isExpired(),

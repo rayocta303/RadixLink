@@ -92,15 +92,18 @@ class TenantSeeder extends Seeder
             'max_users' => $planLimits['max_users'],
             'max_vouchers' => $planLimits['max_vouchers'],
             'max_online_users' => $planLimits['max_online_users'],
-            'trial_ends_at' => now()->addDays(14),
             'is_active' => true,
             'is_suspended' => false,
         ]);
         
         if ($dbCredentials) {
-            DB::table('tenants')
-                ->where('id', $tenant->id)
-                ->update(['data' => json_encode($dbCredentials)]);
+            $tenant->update([
+                'tenancy_db_name' => $dbCredentials['tenancy_db_name'],
+                'tenancy_db_username' => $dbCredentials['tenancy_db_username'],
+                'tenancy_db_password' => $dbCredentials['tenancy_db_password'],
+                'tenancy_db_host' => $dbCredentials['tenancy_db_host'],
+                'data' => $dbCredentials,
+            ]);
         }
 
         $ownerUser = User::create([

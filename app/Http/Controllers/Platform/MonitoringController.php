@@ -36,8 +36,7 @@ class MonitoringController extends Controller
             ->where('is_suspended', false)
             ->count();
         $suspendedTenants = Tenant::where('is_suspended', true)->count();
-        $trialTenants = Tenant::whereNotNull('trial_ends_at')
-            ->where('trial_ends_at', '>', $now)
+        $newThisMonth = Tenant::whereBetween('created_at', [$startOfMonth, $now])
             ->count();
         $expiringThisMonth = Tenant::whereBetween('subscription_expires_at', [$now, $endOfMonth])
             ->count();
@@ -90,7 +89,7 @@ class MonitoringController extends Controller
                 'total' => $totalTenants,
                 'active' => $activeTenants,
                 'suspended' => $suspendedTenants,
-                'trial' => $trialTenants,
+                'newThisMonth' => $newThisMonth,
                 'expiringThisMonth' => $expiringThisMonth,
             ],
             'subscriptionStats' => [

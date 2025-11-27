@@ -22,7 +22,6 @@ class CreateTenantsTable extends Migration
             $table->string('custom_domain')->nullable()->unique();
             $table->string('subscription_plan')->default('basic');
             $table->timestamp('subscription_expires_at')->nullable();
-            $table->timestamp('trial_ends_at')->nullable();
             $table->boolean('is_active')->default(true);
             $table->boolean('is_suspended')->default(false);
             $table->string('suspend_reason')->nullable();
@@ -32,6 +31,10 @@ class CreateTenantsTable extends Migration
             $table->integer('max_online_users')->default(10);
             $table->json('settings')->nullable();
             $table->json('data')->nullable();
+            $table->string('tenancy_db_name')->nullable();
+            $table->string('tenancy_db_username')->nullable();
+            $table->string('tenancy_db_password')->nullable();
+            $table->string('tenancy_db_host')->nullable();
             $table->timestamps();
         });
     }
