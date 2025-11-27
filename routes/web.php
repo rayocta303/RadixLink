@@ -101,13 +101,14 @@ Route::middleware('auth')->group(function () {
         });
 
         Route::middleware('tenant.role:owner,admin,cashier,reseller')->group(function () {
-            Route::resource('vouchers', VoucherController::class);
+            // Custom voucher routes BEFORE resource to prevent route conflicts
             Route::get('vouchers/generate', [VoucherController::class, 'showGenerate'])->name('vouchers.generate');
             Route::post('vouchers/generate', [VoucherController::class, 'generate'])->name('vouchers.generate.store');
-            Route::get('vouchers/print/{batch}', [VoucherController::class, 'print'])->name('vouchers.print');
             Route::get('vouchers/print-selected', [VoucherController::class, 'printSelected'])->name('vouchers.print-selected');
+            Route::get('vouchers/print/{batch}', [VoucherController::class, 'print'])->name('vouchers.print');
             Route::post('vouchers/bulk-delete', [VoucherController::class, 'bulkDelete'])->name('vouchers.bulk-delete');
             Route::get('vouchers/batches', [VoucherController::class, 'batches'])->name('vouchers.batches');
+            Route::resource('vouchers', VoucherController::class);
         });
 
         Route::middleware('tenant.role:owner,admin')->group(function () {
