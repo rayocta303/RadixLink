@@ -73,16 +73,18 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     
     public function getTenantDatabase(): ?string
     {
-        return $this->data['tenancy_db_name'] ?? null;
+        return $this->tenancy_db_name 
+            ?? $this->data['tenancy_db_name'] 
+            ?? null;
     }
     
     public function getTenantDatabaseCredentials(): array
     {
         return [
-            'database' => $this->data['tenancy_db_name'] ?? null,
-            'username' => $this->data['tenancy_db_username'] ?? null,
-            'password' => $this->data['tenancy_db_password'] ?? null,
-            'host' => $this->data['tenancy_db_host'] ?? config('database.connections.mysql.host'),
+            'database' => $this->tenancy_db_name ?? $this->data['tenancy_db_name'] ?? null,
+            'username' => $this->tenancy_db_username ?? $this->data['tenancy_db_username'] ?? null,
+            'password' => $this->tenancy_db_password ?? $this->data['tenancy_db_password'] ?? null,
+            'host' => $this->tenancy_db_host ?? $this->data['tenancy_db_host'] ?? config('database.connections.mysql.host'),
         ];
     }
 

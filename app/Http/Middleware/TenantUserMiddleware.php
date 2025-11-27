@@ -36,12 +36,9 @@ class TenantUserMiddleware
             abort(403, 'Tenant is not active or has expired.');
         }
 
-        try {
-            TenantDatabaseManager::setTenant($tenant);
-            view()->share('currentTenant', $tenant);
-        } catch (\Exception $e) {
-            abort(500, 'Failed to connect to tenant database: ' . $e->getMessage());
-        }
+        TenantDatabaseManager::setTenant($tenant);
+        view()->share('currentTenant', $tenant);
+        view()->share('tenantDbConnected', TenantDatabaseManager::isConnected());
 
         return $next($request);
     }

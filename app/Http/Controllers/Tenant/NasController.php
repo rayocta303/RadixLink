@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Nas;
+use App\Services\TenantDatabaseManager;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -11,6 +12,13 @@ class NasController extends Controller
 {
     public function index()
     {
+        if (!TenantDatabaseManager::isConnected()) {
+            return view('tenant.nas.index', [
+                'nasList' => collect(),
+                'dbError' => 'Database tenant belum dikonfigurasi. Silakan hubungi administrator.',
+            ]);
+        }
+        
         $nasList = Nas::orderBy('name')->get();
         return view('tenant.nas.index', compact('nasList'));
     }
