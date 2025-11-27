@@ -70,6 +70,7 @@ return new class extends Migration
             $table->integer('paper_size')->default(4);
             $table->enum('orientation', ['portrait', 'landscape'])->default('portrait');
             $table->integer('vouchers_per_page')->default(1);
+            $table->integer('columns_per_row')->default(3);
             $table->boolean('show_qr_code')->default(true);
             $table->boolean('show_logo')->default(true);
             $table->boolean('is_default')->default(false);

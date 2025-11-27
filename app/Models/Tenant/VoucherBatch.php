@@ -16,6 +16,11 @@ class VoucherBatch extends TenantModel
         'created_by',
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     protected static function boot()
     {
         parent::boot();
@@ -33,6 +38,11 @@ class VoucherBatch extends TenantModel
     public function vouchers()
     {
         return $this->hasMany(Voucher::class, 'batch_id', 'batch_id');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'created_by');
     }
 
     public function getUsagePercentageAttribute(): float
