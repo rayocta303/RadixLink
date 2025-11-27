@@ -105,6 +105,14 @@ class RolesAndPermissionsSeeder extends Seeder
             'tickets.close',
             'users.view',
         ]);
+
+        Role::firstOrCreate(['name' => 'tenant_owner', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'tenant_admin', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'tenant_technician', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'tenant_cashier', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'tenant_support', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'tenant_reseller', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'tenant_investor', 'guard_name' => 'web']);
     }
 
     public function seedTenantRolesAndPermissions(): void

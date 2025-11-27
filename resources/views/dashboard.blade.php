@@ -58,10 +58,10 @@
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Router</span>
                             <span class="text-sm text-gray-500 dark:text-gray-400">
-                                {{ $usageData['usage']['routers'] ?? 0 }} / {{ $usageData['limits']['max_routers'] >= 9999 ? 'Unlimited' : $usageData['limits']['max_routers'] }}
+                                {{ $usageData['routers']['current'] ?? 0 }} / {{ ($usageData['routers']['limit'] ?? 0) >= 9999 ? 'Unlimited' : ($usageData['routers']['limit'] ?? 0) }}
                             </span>
                         </div>
-                        @php $routerPct = min(100, $usageData['percentage']['routers'] ?? 0); @endphp
+                        @php $routerPct = min(100, $usageData['routers']['percentage'] ?? 0); @endphp
                         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
                             <div class="h-2.5 rounded-full {{ $routerPct > 80 ? 'bg-red-500' : ($routerPct > 60 ? 'bg-yellow-500' : 'bg-green-500') }}" style="width: {{ $routerPct }}%"></div>
                         </div>
@@ -70,10 +70,10 @@
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Pelanggan</span>
                             <span class="text-sm text-gray-500 dark:text-gray-400">
-                                {{ $usageData['usage']['customers'] ?? 0 }} / {{ $usageData['limits']['max_users'] >= 99999 ? 'Unlimited' : number_format($usageData['limits']['max_users']) }}
+                                {{ $usageData['customers']['current'] ?? 0 }} / {{ ($usageData['customers']['limit'] ?? 0) >= 99999 ? 'Unlimited' : number_format($usageData['customers']['limit'] ?? 0) }}
                             </span>
                         </div>
-                        @php $customerPct = min(100, $usageData['percentage']['customers'] ?? 0); @endphp
+                        @php $customerPct = min(100, $usageData['customers']['percentage'] ?? 0); @endphp
                         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
                             <div class="h-2.5 rounded-full {{ $customerPct > 80 ? 'bg-red-500' : ($customerPct > 60 ? 'bg-yellow-500' : 'bg-green-500') }}" style="width: {{ $customerPct }}%"></div>
                         </div>
@@ -82,10 +82,10 @@
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Voucher</span>
                             <span class="text-sm text-gray-500 dark:text-gray-400">
-                                {{ number_format($usageData['usage']['vouchers'] ?? 0) }} / {{ $usageData['limits']['max_vouchers'] >= 999999 ? 'Unlimited' : number_format($usageData['limits']['max_vouchers']) }}
+                                {{ number_format($usageData['vouchers']['current'] ?? 0) }} / {{ ($usageData['vouchers']['limit'] ?? 0) >= 999999 ? 'Unlimited' : number_format($usageData['vouchers']['limit'] ?? 0) }}
                             </span>
                         </div>
-                        @php $voucherPct = min(100, $usageData['percentage']['vouchers'] ?? 0); @endphp
+                        @php $voucherPct = min(100, $usageData['vouchers']['percentage'] ?? 0); @endphp
                         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
                             <div class="h-2.5 rounded-full {{ $voucherPct > 80 ? 'bg-red-500' : ($voucherPct > 60 ? 'bg-yellow-500' : 'bg-green-500') }}" style="width: {{ $voucherPct }}%"></div>
                         </div>
@@ -94,10 +94,10 @@
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">User Online</span>
                             <span class="text-sm text-gray-500 dark:text-gray-400">
-                                {{ $usageData['usage']['online_users'] ?? 0 }} / {{ $usageData['limits']['max_online_users'] >= 9999 ? 'Unlimited' : number_format($usageData['limits']['max_online_users']) }}
+                                {{ $usageData['online_users']['current'] ?? 0 }} / {{ ($usageData['online_users']['limit'] ?? 0) >= 9999 ? 'Unlimited' : number_format($usageData['online_users']['limit'] ?? 0) }}
                             </span>
                         </div>
-                        @php $onlinePct = min(100, $usageData['percentage']['online_users'] ?? 0); @endphp
+                        @php $onlinePct = min(100, $usageData['online_users']['percentage'] ?? 0); @endphp
                         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
                             <div class="h-2.5 rounded-full {{ $onlinePct > 80 ? 'bg-red-500' : ($onlinePct > 60 ? 'bg-yellow-500' : 'bg-green-500') }}" style="width: {{ $onlinePct }}%"></div>
                         </div>
