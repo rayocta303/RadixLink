@@ -58,6 +58,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             'custom_domain',
             'subscription_plan',
             'subscription_expires_at',
+            'trial_ends_at',
             'is_active',
             'is_suspended',
             'suspend_reason',
@@ -66,6 +67,22 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             'max_vouchers',
             'max_online_users',
             'settings',
+            'data',
+        ];
+    }
+    
+    public function getTenantDatabase(): ?string
+    {
+        return $this->data['tenancy_db_name'] ?? null;
+    }
+    
+    public function getTenantDatabaseCredentials(): array
+    {
+        return [
+            'database' => $this->data['tenancy_db_name'] ?? null,
+            'username' => $this->data['tenancy_db_username'] ?? null,
+            'password' => $this->data['tenancy_db_password'] ?? null,
+            'host' => $this->data['tenancy_db_host'] ?? config('database.connections.mysql.host'),
         ];
     }
 

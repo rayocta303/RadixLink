@@ -68,7 +68,7 @@ return new class extends Migration
 
         Schema::create('resellers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->string('code')->unique();
             $table->string('name');
             $table->string('phone')->nullable();
@@ -77,6 +77,8 @@ return new class extends Migration
             $table->decimal('commission_rate', 5, 2)->default(0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            
+            $table->index('user_id');
         });
 
         Schema::create('reseller_transactions', function (Blueprint $table) {

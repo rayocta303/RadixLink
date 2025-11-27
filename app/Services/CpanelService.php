@@ -152,30 +152,66 @@ class CpanelService
         $dbUser = $dbName;
         $dbPass = bin2hex(random_bytes(8));
 
-        $dbResult = $this->createDatabase($dbName);
-        if (!$dbResult['success']) {
-            return $dbResult;
+        $existingDbs = $this->listDatabases();
+        $fullDbName = $this->username . '_' . $dbName;
+        $fullUsername = $this->username . '_' . $dbUser;
+        
+        $dbExists = false;
+        $userExists = false;
+        
+        if ($existingDbs['success'] && isset($existingDbs['data'])) {
+            foreach ($existingDbs['data'] as $db) {
+                if ($db['database'] === $fullDbName) {
+                    $dbExists = true;
+                    if (!empty($db['users']) && in_array($fullUsername, $db['users'])) {
+                        $userExists = true;
+                    }
+                    break;
+                }
+            }
         }
 
-        $userResult = $this->createDatabaseUser($dbUser, $dbPass);
-        if (!$userResult['success']) {
-            $this->deleteDatabase($dbName);
-            return $userResult;
+        if ($dbExists && $userExists) {
+            Log::info("Database and user already exist: {$fullDbName}");
+            return [
+                'success' => true,
+                'database' => $fullDbName,
+                'username' => $fullUsername,
+                'password' => $dbPass,
+                'host' => env('DB_HOST', $this->host),
+                'existing' => true,
+            ];
         }
 
-        $privResult = $this->setDatabaseUserPrivileges($userResult['username'], $dbResult['database_name']);
+        if (!$dbExists) {
+            $dbResult = $this->createDatabase($dbName);
+            if (!$dbResult['success']) {
+                if (strpos($dbResult['error'] ?? '', 'already exists') === false) {
+                    return $dbResult;
+                }
+            }
+        }
+
+        if (!$userExists) {
+            $userResult = $this->createDatabaseUser($dbUser, $dbPass);
+            if (!$userResult['success']) {
+                if (strpos($userResult['error'] ?? '', 'already exists') === false) {
+                    return $userResult;
+                }
+            }
+        }
+
+        $privResult = $this->setDatabaseUserPrivileges($fullUsername, $fullDbName);
         if (!$privResult['success']) {
-            $this->deleteDatabase($dbName);
-            $this->deleteDatabaseUser($dbUser);
-            return $privResult;
+            Log::warning("Could not set privileges: " . ($privResult['error'] ?? 'Unknown error'));
         }
 
         return [
             'success' => true,
-            'database' => $dbResult['database_name'],
-            'username' => $userResult['username'],
+            'database' => $fullDbName,
+            'username' => $fullUsername,
             'password' => $dbPass,
-            'host' => $this->host,
+            'host' => env('DB_HOST', $this->host),
         ];
     }
 
