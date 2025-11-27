@@ -56,6 +56,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('tenant')->name('tenant.')->middleware('tenant.user')->group(function () {
         Route::resource('nas', NasController::class);
         Route::post('nas/{nas}/test', [NasController::class, 'test'])->name('nas.test');
+        Route::get('nas-map', [NasController::class, 'map'])->name('nas.map');
         
         Route::resource('services', ServicePlanController::class);
         Route::resource('customers', CustomerController::class);

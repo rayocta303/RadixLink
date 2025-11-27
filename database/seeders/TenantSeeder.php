@@ -268,8 +268,8 @@ class TenantSeeder extends Seeder
             ]);
 
             DB::connection($connectionName)->table('nas')->insert([
-                ['name' => 'Router Utama', 'shortname' => 'router-main', 'nasname' => '192.168.1.1', 'ports' => 1812, 'secret' => 'secret123', 'type' => 'mikrotik', 'api_username' => 'admin', 'api_password' => 'admin', 'api_port' => 8728, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-                ['name' => 'Hotspot Area A', 'shortname' => 'hotspot-a', 'nasname' => '192.168.2.1', 'ports' => 1812, 'secret' => 'secret456', 'type' => 'mikrotik', 'api_username' => 'admin', 'api_password' => 'admin', 'api_port' => 8728, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+                ['name' => 'Router Utama', 'shortname' => 'router-main', 'nasname' => '192.168.1.1', 'ports' => 1812, 'secret' => 'secret123', 'type' => 'mikrotik', 'location_name' => 'Kantor Pusat', 'longitude' => 106.8456, 'latitude' => -6.2088, 'coverage' => 500, 'api_username' => 'admin', 'api_password' => 'admin', 'api_port' => 8728, 'winbox_port' => 8291, 'is_active' => true, 'status' => 'enabled', 'vpn_enabled' => false, 'vpn_port' => 1701, 'created_at' => now(), 'updated_at' => now()],
+                ['name' => 'Hotspot Area A', 'shortname' => 'hotspot-a', 'nasname' => '192.168.2.1', 'ports' => 1812, 'secret' => 'secret456', 'type' => 'mikrotik', 'location_name' => 'Hotspot Area A', 'longitude' => 107.6191, 'latitude' => -6.9175, 'coverage' => 200, 'api_username' => 'admin', 'api_password' => 'admin', 'api_port' => 8728, 'winbox_port' => 8291, 'is_active' => true, 'status' => 'enabled', 'vpn_enabled' => false, 'vpn_port' => 1701, 'created_at' => now(), 'updated_at' => now()],
             ]);
 
             $planIds = DB::connection($connectionName)->table('service_plans')->pluck('id')->toArray();

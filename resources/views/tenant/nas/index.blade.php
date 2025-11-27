@@ -20,11 +20,23 @@
 </div>
 @endif
 
-<div class="sm:flex sm:items-center">
+<div class="sm:flex sm:items-center sm:justify-between">
     <div class="sm:flex-auto">
         <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">Kelola perangkat NAS dan router (MikroTik, UniFi, dll.)</p>
     </div>
-    <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+    <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none flex flex-wrap gap-3">
+        <a href="{{ route('tenant.nas.map') }}" class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-500 {{ isset($dbError) ? 'opacity-50 pointer-events-none' : '' }}">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+            </svg>
+            Lihat Peta
+        </a>
+        <a href="{{ route('tenant.router-scripts.index') }}" class="inline-flex items-center gap-2 rounded-md bg-green-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-green-500 {{ isset($dbError) ? 'opacity-50 pointer-events-none' : '' }}">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+            Download Script
+        </a>
         <a href="{{ route('tenant.nas.create') }}" class="inline-flex items-center gap-2 rounded-md bg-primary-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-primary-500 {{ isset($dbError) ? 'opacity-50 pointer-events-none' : '' }}">
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -34,7 +46,7 @@
     </div>
 </div>
 
-<div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-3">
+<div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-4">
     <div class="bg-white dark:bg-gray-800 overflow-hidden rounded-lg shadow">
         <div class="p-5">
             <div class="flex items-center">
@@ -92,6 +104,25 @@
             </div>
         </div>
     </div>
+    <div class="bg-white dark:bg-gray-800 overflow-hidden rounded-lg shadow">
+        <div class="p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                        <svg class="h-5 w-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">VPN Aktif</dt>
+                        <dd class="text-lg font-semibold text-gray-900 dark:text-white">{{ $nasList->where('vpn_enabled', true)->count() ?? 0 }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="mt-8 bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
@@ -101,9 +132,11 @@
                 <tr>
                     <th>Nama</th>
                     <th>IP Address</th>
+                    <th>Lokasi</th>
                     <th>Tipe</th>
-                    <th>Secret</th>
                     <th>Status</th>
+                    <th>VPN</th>
+                    <th>Koneksi</th>
                     <th>Last Seen</th>
                     <th class="no-sort">Aksi</th>
                 </tr>
@@ -128,12 +161,45 @@
                         <span class="font-mono text-sm">{{ $nas->nasname }}</span>
                     </td>
                     <td>
+                        @if($nas->location_name)
+                            <div class="flex items-center gap-1">
+                                <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                </svg>
+                                <span class="text-sm">{{ $nas->location_name }}</span>
+                            </div>
+                        @else
+                            <span class="text-gray-400 text-sm">-</span>
+                        @endif
+                    </td>
+                    <td>
                         <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
                             {{ $nas->type ?? 'MikroTik' }}
                         </span>
                     </td>
                     <td>
-                        <span class="font-mono text-sm text-gray-500">{{ Str::mask($nas->secret ?? '', '*', 3) }}</span>
+                        @if(($nas->status ?? 'enabled') == 'enabled')
+                            <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                Enabled
+                            </span>
+                        @else
+                            <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-700 dark:text-gray-400">
+                                Disabled
+                            </span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($nas->vpn_enabled ?? false)
+                            <span class="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
+                                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                                </svg>
+                                {{ strtoupper($nas->vpn_type ?? 'VPN') }}
+                            </span>
+                        @else
+                            <span class="text-gray-400 text-sm">-</span>
+                        @endif
                     </td>
                     <td>
                         @if($nas->is_online ?? false)
@@ -156,6 +222,11 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9" />
                                 </svg>
                             </button>
+                            <a href="{{ route('tenant.router-scripts.index', ['nas' => $nas->id]) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300" title="Download Script">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                </svg>
+                            </a>
                             <a href="{{ route('tenant.nas.edit', $nas) }}" class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300" title="Edit">
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />

@@ -43,12 +43,30 @@ class NasController extends Controller
             'api_username' => 'nullable|string|max:64',
             'api_password' => 'nullable|string|max:64',
             'api_port' => 'nullable|integer|min:1|max:65535',
+            'winbox_port' => 'nullable|integer|min:1|max:65535',
             'use_ssl' => 'boolean',
             'is_active' => 'boolean',
+            'location_name' => 'nullable|string|max:255',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'coverage' => 'nullable|integer|min:0',
+            'status' => 'required|in:enabled,disabled',
+            'vpn_enabled' => 'boolean',
+            'vpn_secret' => 'nullable|string|max:128',
+            'vpn_port' => 'nullable|integer|min:1|max:65535',
+            'vpn_type' => 'nullable|in:l2tp,pptp,sstp,ovpn,wireguard',
+            'vpn_server' => 'nullable|string|max:255',
+            'vpn_username' => 'nullable|string|max:64',
+            'vpn_password' => 'nullable|string|max:64',
+            'vpn_local_address' => 'nullable|string|max:64',
+            'vpn_remote_address' => 'nullable|string|max:64',
         ]);
 
         $validated['use_ssl'] = $request->boolean('use_ssl');
         $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['vpn_enabled'] = $request->boolean('vpn_enabled');
+        $validated['winbox_port'] = $request->input('winbox_port', 8291);
+        $validated['vpn_port'] = $request->input('vpn_port', 1701);
 
         Nas::create($validated);
 
@@ -85,12 +103,28 @@ class NasController extends Controller
             'api_username' => 'nullable|string|max:64',
             'api_password' => 'nullable|string|max:64',
             'api_port' => 'nullable|integer|min:1|max:65535',
+            'winbox_port' => 'nullable|integer|min:1|max:65535',
             'use_ssl' => 'boolean',
             'is_active' => 'boolean',
+            'location_name' => 'nullable|string|max:255',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'coverage' => 'nullable|integer|min:0',
+            'status' => 'required|in:enabled,disabled',
+            'vpn_enabled' => 'boolean',
+            'vpn_secret' => 'nullable|string|max:128',
+            'vpn_port' => 'nullable|integer|min:1|max:65535',
+            'vpn_type' => 'nullable|in:l2tp,pptp,sstp,ovpn,wireguard',
+            'vpn_server' => 'nullable|string|max:255',
+            'vpn_username' => 'nullable|string|max:64',
+            'vpn_password' => 'nullable|string|max:64',
+            'vpn_local_address' => 'nullable|string|max:64',
+            'vpn_remote_address' => 'nullable|string|max:64',
         ]);
 
         $validated['use_ssl'] = $request->boolean('use_ssl');
         $validated['is_active'] = $request->boolean('is_active');
+        $validated['vpn_enabled'] = $request->boolean('vpn_enabled');
 
         $nas->update($validated);
 
@@ -114,5 +148,23 @@ class NasController extends Controller
         $nas->update(['last_seen' => now()]);
 
         return back()->with('success', 'Koneksi ke ' . $nas->name . ' berhasil!');
+    }
+
+    public function map()
+    {
+        if (!TenantDatabaseManager::isConnected()) {
+            return view('tenant.nas.map', [
+                'nasList' => collect(),
+                'dbError' => 'Database tenant belum dikonfigurasi. Silakan hubungi administrator.',
+            ]);
+        }
+        
+        $nasList = Nas::whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->where('status', 'enabled')
+            ->orderBy('name')
+            ->get();
+            
+        return view('tenant.nas.map', compact('nasList'));
     }
 }

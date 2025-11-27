@@ -22,6 +22,7 @@ class CreateTenantsTable extends Migration
             $table->string('custom_domain')->nullable()->unique();
             $table->string('subscription_plan')->default('basic');
             $table->timestamp('subscription_expires_at')->nullable();
+            $table->timestamp('trial_ends_at')->nullable();
             $table->boolean('is_active')->default(true);
             $table->boolean('is_suspended')->default(false);
             $table->string('suspend_reason')->nullable();

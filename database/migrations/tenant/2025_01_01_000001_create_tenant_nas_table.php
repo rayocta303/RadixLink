@@ -19,11 +19,30 @@ return new class extends Migration
             $table->string('community')->nullable();
             $table->string('description')->nullable();
             $table->enum('type', ['mikrotik', 'unifi', 'openwrt', 'cisco', 'other'])->default('mikrotik');
+            
+            $table->string('location_name')->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->integer('coverage')->nullable()->comment('Coverage radius in meters');
+            
             $table->string('api_username')->nullable();
             $table->string('api_password')->nullable();
             $table->integer('api_port')->default(8728);
+            $table->integer('winbox_port')->default(8291);
             $table->boolean('use_ssl')->default(false);
             $table->boolean('is_active')->default(true);
+            $table->enum('status', ['enabled', 'disabled'])->default('enabled');
+            
+            $table->boolean('vpn_enabled')->default(false);
+            $table->string('vpn_secret')->nullable();
+            $table->integer('vpn_port')->default(1701);
+            $table->enum('vpn_type', ['l2tp', 'pptp', 'sstp', 'ovpn', 'wireguard'])->nullable();
+            $table->string('vpn_server')->nullable();
+            $table->string('vpn_username')->nullable();
+            $table->string('vpn_password')->nullable();
+            $table->string('vpn_local_address')->nullable();
+            $table->string('vpn_remote_address')->nullable();
+            
             $table->timestamp('last_seen')->nullable();
             $table->json('info')->nullable();
             $table->timestamps();
