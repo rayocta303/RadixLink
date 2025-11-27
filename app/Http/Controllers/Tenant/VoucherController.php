@@ -125,9 +125,10 @@ class VoucherController extends Controller
             'service_plan_id' => 'required|exists:tenant.service_plans,id',
             'quantity' => 'required|integer|min:1|max:500',
             'type' => 'required|in:single,multi',
-            'max_usage' => 'required_if:type,multi|integer|min:1',
+            'max_usage' => 'required_if:type,multi|integer|min:2|max:100',
             'prefix' => 'nullable|string|max:10',
             'code_length' => 'required|integer|min:4|max:16',
+            'code_type' => 'nullable|in:alphanumeric,numeric,alpha',
         ]);
 
         $servicePlan = ServicePlan::find($validated['service_plan_id']);
@@ -135,10 +136,20 @@ class VoucherController extends Controller
         $quantity = $validated['quantity'];
         $prefix = $validated['prefix'] ?? '';
         $codeLength = $validated['code_length'];
+        $codeType = $validated['code_type'] ?? 'alphanumeric';
+        
+        $prefixLength = strlen($prefix);
+        if ($prefixLength >= $codeLength) {
+            return redirect()->route('tenant.vouchers.create')
+                ->with('error', 'Prefix terlalu panjang. Maksimal ' . ($codeLength - 1) . ' karakter untuk panjang kode ' . $codeLength . '.')
+                ->withInput();
+        }
+        
+        $randomLength = $codeLength - $prefixLength;
 
         $vouchers = [];
         for ($i = 0; $i < $quantity; $i++) {
-            $code = $prefix . Voucher::generateCode($codeLength - strlen($prefix));
+            $code = Voucher::generateCode($randomLength, $codeType, $prefix);
             $vouchers[] = [
                 'code' => $code,
                 'username' => 'v' . Str::random(6),
@@ -146,7 +157,8 @@ class VoucherController extends Controller
                 'service_plan_id' => $validated['service_plan_id'],
                 'status' => 'unused',
                 'type' => $validated['type'],
-                'max_usage' => $validated['type'] === 'multi' ? $validated['max_usage'] : 1,
+                'max_usage' => $validated['type'] === 'multi' ? (int)$validated['max_usage'] : 1,
+                'used_count' => 0,
                 'price' => $servicePlan->price,
                 'batch_id' => $batchId,
                 'generated_at' => now(),
@@ -343,10 +355,9 @@ class VoucherController extends Controller
         }
 
         $batches = Voucher::select('batch_id', DB::raw('COUNT(*) as total'), 
-                DB::raw('SUM(CASE WHEN status = "unused" THEN 1 ELSE 0 END) as unused'),
-                DB::raw('SUM(CASE WHEN status = "used" THEN 1 ELSE 0 END) as used'),
+                DB::raw("SUM(CASE WHEN status = 'unused' THEN 1 ELSE 0 END) as unused"),
+                DB::raw("SUM(CASE WHEN status = 'used' THEN 1 ELSE 0 END) as used"),
                 DB::raw('MIN(created_at) as created_at'))
-            ->with('servicePlan')
             ->whereNotNull('batch_id')
             ->groupBy('batch_id')
             ->orderBy('created_at', 'desc')
