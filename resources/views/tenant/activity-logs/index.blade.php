@@ -226,7 +226,7 @@
             </tbody>
         </table>
 
-        @if($logs->hasPages())
+        @if($logs instanceof \Illuminate\Pagination\LengthAwarePaginator && $logs->hasPages())
         <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             {{ $logs->withQueryString()->links() }}
         </div>
