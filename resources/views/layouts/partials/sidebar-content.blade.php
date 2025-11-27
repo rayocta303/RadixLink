@@ -130,13 +130,33 @@
                                 Customers
                             </a>
                         </li>
-                        <li>
-                            <a href="{{ route('tenant.vouchers.index') }}" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('tenant.vouchers.*') ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">
+                        <li x-data="{ open: {{ request()->routeIs('tenant.vouchers.*') || request()->routeIs('tenant.voucher-templates.*') ? 'true' : 'false' }} }">
+                            <button @click="open = !open" class="w-full group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('tenant.vouchers.*') || request()->routeIs('tenant.voucher-templates.*') ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">
                                 <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/>
                                 </svg>
                                 Vouchers
-                            </a>
+                                <svg class="ml-auto h-5 w-5 shrink-0 transition-transform" :class="{ 'rotate-90': open }" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                                </svg>
+                            </button>
+                            <ul x-show="open" x-collapse class="mt-1 px-2 space-y-1">
+                                <li>
+                                    <a href="{{ route('tenant.vouchers.index') }}" class="group flex gap-x-3 rounded-md py-2 pl-9 pr-2 text-sm leading-6 {{ request()->routeIs('tenant.vouchers.index') ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">
+                                        Daftar Voucher
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('tenant.vouchers.create') }}" class="group flex gap-x-3 rounded-md py-2 pl-9 pr-2 text-sm leading-6 {{ request()->routeIs('tenant.vouchers.create') ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">
+                                        Generate Voucher
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('tenant.voucher-templates.index') }}" class="group flex gap-x-3 rounded-md py-2 pl-9 pr-2 text-sm leading-6 {{ request()->routeIs('tenant.voucher-templates.*') ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">
+                                        Template Voucher
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <li>
                             <a href="{{ route('tenant.invoices.index') }}" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('tenant.invoices.*') ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">

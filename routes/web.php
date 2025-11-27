@@ -25,6 +25,7 @@ use App\Http\Controllers\Tenant\UserController;
 use App\Http\Controllers\Tenant\RoleController as TenantRoleController;
 use App\Http\Controllers\Tenant\MonitoringController as TenantMonitoringController;
 use App\Http\Controllers\Tenant\ActivityLogController as TenantActivityLogController;
+use App\Http\Controllers\Tenant\VoucherTemplateController;
 
 Route::get('/', function () {
     $plans = \App\Models\SubscriptionPlan::active()->ordered()->get();
@@ -104,6 +105,16 @@ Route::middleware('auth')->group(function () {
             Route::get('vouchers/generate', [VoucherController::class, 'showGenerate'])->name('vouchers.generate');
             Route::post('vouchers/generate', [VoucherController::class, 'generate'])->name('vouchers.generate.store');
             Route::get('vouchers/print/{batch}', [VoucherController::class, 'print'])->name('vouchers.print');
+            Route::get('vouchers/print-selected', [VoucherController::class, 'printSelected'])->name('vouchers.print-selected');
+            Route::post('vouchers/bulk-delete', [VoucherController::class, 'bulkDelete'])->name('vouchers.bulk-delete');
+            Route::get('vouchers/batches', [VoucherController::class, 'batches'])->name('vouchers.batches');
+        });
+
+        Route::middleware('tenant.role:owner,admin')->group(function () {
+            Route::resource('voucher-templates', VoucherTemplateController::class);
+            Route::post('voucher-templates/{voucher_template}/set-default', [VoucherTemplateController::class, 'setDefault'])->name('voucher-templates.set-default');
+            Route::post('voucher-templates/{voucher_template}/duplicate', [VoucherTemplateController::class, 'duplicate'])->name('voucher-templates.duplicate');
+            Route::post('voucher-templates/preview', [VoucherTemplateController::class, 'preview'])->name('voucher-templates.preview');
         });
 
         Route::middleware('tenant.role:owner,admin,cashier')->group(function () {
