@@ -174,7 +174,32 @@
                         
                         <div id="features-container" class="mt-4 space-y-3">
                             @php
-                                $features = old('features', $subscription->features ?? []);
+                                $rawFeatures = old('features', $subscription->features ?? []);
+                                $features = [];
+                                
+                                if (is_string($rawFeatures)) {
+                                    $decoded = json_decode($rawFeatures, true);
+                                    if (is_array($decoded)) {
+                                        if (array_is_list($decoded)) {
+                                            $features = $decoded;
+                                        } else {
+                                            $features = array_map(
+                                                fn($key) => ucwords(str_replace('_', ' ', $key)),
+                                                array_keys(array_filter($decoded, fn($v) => $v === true))
+                                            );
+                                        }
+                                    }
+                                } elseif (is_array($rawFeatures)) {
+                                    if (array_is_list($rawFeatures)) {
+                                        $features = $rawFeatures;
+                                    } else {
+                                        $features = array_map(
+                                            fn($key) => ucwords(str_replace('_', ' ', $key)),
+                                            array_keys(array_filter($rawFeatures, fn($v) => $v === true))
+                                        );
+                                    }
+                                }
+                                
                                 if (empty($features)) {
                                     $features = [''];
                                 }
