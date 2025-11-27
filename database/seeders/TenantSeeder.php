@@ -89,8 +89,13 @@ class TenantSeeder extends Seeder
             'trial_ends_at' => now()->addDays(14),
             'is_active' => true,
             'is_suspended' => false,
-            'data' => $dbCredentials,
         ]);
+        
+        if ($dbCredentials) {
+            DB::table('tenants')
+                ->where('id', $tenant->id)
+                ->update(['data' => json_encode($dbCredentials)]);
+        }
 
         $ownerUser = User::create([
             'tenant_id' => $tenant->id,
