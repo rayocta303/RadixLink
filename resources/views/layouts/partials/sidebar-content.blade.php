@@ -114,6 +114,39 @@
                                 Peta Router
                             </a>
                         </li>
+                        <li x-data="{ open: {{ request()->routeIs('tenant.ip-pools.*') || request()->routeIs('tenant.bandwidth.*') || request()->routeIs('tenant.pppoe.*') || request()->routeIs('tenant.hotspot.*') ? 'true' : 'false' }} }">
+                            <button @click="open = !open" class="w-full group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('tenant.ip-pools.*') || request()->routeIs('tenant.bandwidth.*') || request()->routeIs('tenant.pppoe.*') || request()->routeIs('tenant.hotspot.*') ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">
+                                <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z"/>
+                                </svg>
+                                Network
+                                <svg class="ml-auto h-5 w-5 shrink-0 transition-transform" :class="{ 'rotate-90': open }" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                                </svg>
+                            </button>
+                            <ul x-show="open" x-collapse class="mt-1 px-2 space-y-1">
+                                <li>
+                                    <a href="{{ route('tenant.ip-pools.index') }}" class="group flex gap-x-3 rounded-md py-2 pl-9 pr-2 text-sm leading-6 {{ request()->routeIs('tenant.ip-pools.*') ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">
+                                        IP Pool
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('tenant.bandwidth.index') }}" class="group flex gap-x-3 rounded-md py-2 pl-9 pr-2 text-sm leading-6 {{ request()->routeIs('tenant.bandwidth.*') ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">
+                                        Bandwidth
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('tenant.pppoe.index') }}" class="group flex gap-x-3 rounded-md py-2 pl-9 pr-2 text-sm leading-6 {{ request()->routeIs('tenant.pppoe.*') ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">
+                                        PPPoE
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('tenant.hotspot.index') }}" class="group flex gap-x-3 rounded-md py-2 pl-9 pr-2 text-sm leading-6 {{ request()->routeIs('tenant.hotspot.*') ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">
+                                        Hotspot
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
                         <li>
                             <a href="{{ route('tenant.services.index') }}" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('tenant.services.*') ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">
                                 <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">

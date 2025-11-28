@@ -82,4 +82,49 @@ class Nas extends TenantModel
     {
         return $this->vpn_enabled && $this->vpn_type;
     }
+
+    public function ipPools()
+    {
+        return $this->hasMany(IpPool::class);
+    }
+
+    public function pppoeProfiles()
+    {
+        return $this->hasMany(PppoeProfile::class);
+    }
+
+    public function hotspotProfiles()
+    {
+        return $this->hasMany(HotspotProfile::class);
+    }
+
+    public function pppoeServers()
+    {
+        return $this->hasMany(PppoeServer::class);
+    }
+
+    public function hotspotServers()
+    {
+        return $this->hasMany(HotspotServer::class);
+    }
+
+    public function customers()
+    {
+        return $this->hasMany(Customer::class);
+    }
+
+    public function customerSessions()
+    {
+        return $this->hasMany(CustomerSession::class);
+    }
+
+    public function getOnlineUsersCount(): int
+    {
+        return $this->customerSessions()->active()->count();
+    }
+
+    public function getActiveCustomersCount(): int
+    {
+        return $this->customers()->where('status', 'active')->count();
+    }
 }

@@ -26,6 +26,10 @@ use App\Http\Controllers\Tenant\RoleController as TenantRoleController;
 use App\Http\Controllers\Tenant\MonitoringController as TenantMonitoringController;
 use App\Http\Controllers\Tenant\ActivityLogController as TenantActivityLogController;
 use App\Http\Controllers\Tenant\VoucherTemplateController;
+use App\Http\Controllers\Tenant\IpPoolController;
+use App\Http\Controllers\Tenant\BandwidthController;
+use App\Http\Controllers\Tenant\PppoeController;
+use App\Http\Controllers\Tenant\HotspotController;
 
 Route::get('/', function () {
     $plans = \App\Models\SubscriptionPlan::active()->ordered()->get();
@@ -84,6 +88,40 @@ Route::middleware('auth')->group(function () {
             Route::resource('nas', NasController::class);
             Route::post('nas/{nas}/test', [NasController::class, 'test'])->name('nas.test');
             Route::get('nas-map', [NasController::class, 'map'])->name('nas.map');
+
+            Route::resource('ip-pools', IpPoolController::class);
+
+            Route::resource('bandwidth', BandwidthController::class);
+
+            Route::prefix('pppoe')->name('pppoe.')->group(function () {
+                Route::get('/', [PppoeController::class, 'index'])->name('index');
+                Route::get('/profiles/create', [PppoeController::class, 'createProfile'])->name('profiles.create');
+                Route::post('/profiles', [PppoeController::class, 'storeProfile'])->name('profiles.store');
+                Route::get('/profiles/{id}/edit', [PppoeController::class, 'editProfile'])->name('profiles.edit');
+                Route::put('/profiles/{id}', [PppoeController::class, 'updateProfile'])->name('profiles.update');
+                Route::delete('/profiles/{id}', [PppoeController::class, 'destroyProfile'])->name('profiles.destroy');
+                Route::post('/profiles/{id}/script', [PppoeController::class, 'generateScript'])->name('profiles.script');
+                Route::get('/servers/create', [PppoeController::class, 'createServer'])->name('servers.create');
+                Route::post('/servers', [PppoeController::class, 'storeServer'])->name('servers.store');
+                Route::get('/servers/{id}/edit', [PppoeController::class, 'editServer'])->name('servers.edit');
+                Route::put('/servers/{id}', [PppoeController::class, 'updateServer'])->name('servers.update');
+                Route::delete('/servers/{id}', [PppoeController::class, 'destroyServer'])->name('servers.destroy');
+            });
+
+            Route::prefix('hotspot')->name('hotspot.')->group(function () {
+                Route::get('/', [HotspotController::class, 'index'])->name('index');
+                Route::get('/profiles/create', [HotspotController::class, 'createProfile'])->name('profiles.create');
+                Route::post('/profiles', [HotspotController::class, 'storeProfile'])->name('profiles.store');
+                Route::get('/profiles/{id}/edit', [HotspotController::class, 'editProfile'])->name('profiles.edit');
+                Route::put('/profiles/{id}', [HotspotController::class, 'updateProfile'])->name('profiles.update');
+                Route::delete('/profiles/{id}', [HotspotController::class, 'destroyProfile'])->name('profiles.destroy');
+                Route::post('/profiles/{id}/script', [HotspotController::class, 'generateScript'])->name('profiles.script');
+                Route::get('/servers/create', [HotspotController::class, 'createServer'])->name('servers.create');
+                Route::post('/servers', [HotspotController::class, 'storeServer'])->name('servers.store');
+                Route::get('/servers/{id}/edit', [HotspotController::class, 'editServer'])->name('servers.edit');
+                Route::put('/servers/{id}', [HotspotController::class, 'updateServer'])->name('servers.update');
+                Route::delete('/servers/{id}', [HotspotController::class, 'destroyServer'])->name('servers.destroy');
+            });
 
             Route::get('monitoring', [TenantMonitoringController::class, 'index'])->name('monitoring');
             Route::get('monitoring/stats', [TenantMonitoringController::class, 'stats'])->name('monitoring.stats');
