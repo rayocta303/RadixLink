@@ -14,10 +14,11 @@ class TenantDataSeeder extends Seeder
     {
         $this->seedBandwidthProfiles();
         $this->seedIpPools();
-        $this->seedServicePlans();
         $this->seedNas();
+        $this->seedServicePlans();
         $this->seedPppoeProfiles();
         $this->seedHotspotProfiles();
+        $this->updateServicePlanRelations();
         $this->seedPppoeServers();
         $this->seedHotspotServers();
         $this->seedCustomers();
@@ -266,7 +267,7 @@ class TenantDataSeeder extends Seeder
                 'type' => 'pppoe',
                 'price' => 100000,
                 'validity' => 30,
-                'validity_unit' => 'days',
+                'validity_unit' => 'Days',
                 'bandwidth_down' => '5M',
                 'bandwidth_up' => '2M',
                 'quota_bytes' => null,
@@ -275,6 +276,10 @@ class TenantDataSeeder extends Seeder
                 'max_devices' => 1,
                 'simultaneous_use' => 1,
                 'is_active' => true,
+                'router_name' => 'ROUTER-PUSAT',
+                'pool' => 'pool-pppoe-main',
+                'prepaid' => false,
+                'enabled' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -285,7 +290,7 @@ class TenantDataSeeder extends Seeder
                 'type' => 'pppoe',
                 'price' => 150000,
                 'validity' => 30,
-                'validity_unit' => 'days',
+                'validity_unit' => 'Days',
                 'bandwidth_down' => '10M',
                 'bandwidth_up' => '5M',
                 'quota_bytes' => null,
@@ -294,6 +299,10 @@ class TenantDataSeeder extends Seeder
                 'max_devices' => 2,
                 'simultaneous_use' => 1,
                 'is_active' => true,
+                'router_name' => 'ROUTER-PUSAT',
+                'pool' => 'pool-pppoe-main',
+                'prepaid' => false,
+                'enabled' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -304,7 +313,7 @@ class TenantDataSeeder extends Seeder
                 'type' => 'pppoe',
                 'price' => 250000,
                 'validity' => 30,
-                'validity_unit' => 'days',
+                'validity_unit' => 'Days',
                 'bandwidth_down' => '20M',
                 'bandwidth_up' => '10M',
                 'quota_bytes' => null,
@@ -313,6 +322,10 @@ class TenantDataSeeder extends Seeder
                 'max_devices' => 3,
                 'simultaneous_use' => 2,
                 'is_active' => true,
+                'router_name' => 'ROUTER-PUSAT',
+                'pool' => 'pool-pppoe-main',
+                'prepaid' => false,
+                'enabled' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -323,7 +336,7 @@ class TenantDataSeeder extends Seeder
                 'type' => 'pppoe',
                 'price' => 450000,
                 'validity' => 30,
-                'validity_unit' => 'days',
+                'validity_unit' => 'Days',
                 'bandwidth_down' => '50M',
                 'bandwidth_up' => '25M',
                 'quota_bytes' => null,
@@ -332,6 +345,33 @@ class TenantDataSeeder extends Seeder
                 'max_devices' => 5,
                 'simultaneous_use' => 3,
                 'is_active' => true,
+                'router_name' => 'ROUTER-PUSAT',
+                'pool' => 'pool-pppoe-main',
+                'prepaid' => false,
+                'enabled' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Paket Cabang 10 Mbps',
+                'code' => 'PKT-CAB-10',
+                'description' => 'Paket untuk pelanggan cabang Bandung',
+                'type' => 'pppoe',
+                'price' => 125000,
+                'validity' => 30,
+                'validity_unit' => 'Days',
+                'bandwidth_down' => '10M',
+                'bandwidth_up' => '5M',
+                'quota_bytes' => null,
+                'has_fup' => false,
+                'can_share' => false,
+                'max_devices' => 2,
+                'simultaneous_use' => 1,
+                'is_active' => true,
+                'router_name' => 'ROUTER-BDG',
+                'pool' => 'pool-pppoe-ext',
+                'prepaid' => false,
+                'enabled' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -342,7 +382,7 @@ class TenantDataSeeder extends Seeder
                 'type' => 'hotspot',
                 'price' => 3000,
                 'validity' => 1,
-                'validity_unit' => 'hours',
+                'validity_unit' => 'Hrs',
                 'bandwidth_down' => '3M',
                 'bandwidth_up' => '1M',
                 'quota_bytes' => 536870912,
@@ -351,6 +391,10 @@ class TenantDataSeeder extends Seeder
                 'max_devices' => 1,
                 'simultaneous_use' => 1,
                 'is_active' => true,
+                'router_name' => 'HS-CAFE',
+                'pool' => 'pool-hotspot-a',
+                'prepaid' => true,
+                'enabled' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -361,7 +405,7 @@ class TenantDataSeeder extends Seeder
                 'type' => 'hotspot',
                 'price' => 5000,
                 'validity' => 3,
-                'validity_unit' => 'hours',
+                'validity_unit' => 'Hrs',
                 'bandwidth_down' => '5M',
                 'bandwidth_up' => '2M',
                 'quota_bytes' => 1073741824,
@@ -370,6 +414,10 @@ class TenantDataSeeder extends Seeder
                 'max_devices' => 1,
                 'simultaneous_use' => 1,
                 'is_active' => true,
+                'router_name' => 'HS-CAFE',
+                'pool' => 'pool-hotspot-a',
+                'prepaid' => true,
+                'enabled' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -380,7 +428,7 @@ class TenantDataSeeder extends Seeder
                 'type' => 'hotspot',
                 'price' => 10000,
                 'validity' => 24,
-                'validity_unit' => 'hours',
+                'validity_unit' => 'Hrs',
                 'bandwidth_down' => '10M',
                 'bandwidth_up' => '5M',
                 'quota_bytes' => null,
@@ -389,6 +437,10 @@ class TenantDataSeeder extends Seeder
                 'max_devices' => 1,
                 'simultaneous_use' => 1,
                 'is_active' => true,
+                'router_name' => 'HS-CAFE',
+                'pool' => 'pool-hotspot-a',
+                'prepaid' => true,
+                'enabled' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -399,7 +451,7 @@ class TenantDataSeeder extends Seeder
                 'type' => 'hotspot',
                 'price' => 35000,
                 'validity' => 7,
-                'validity_unit' => 'days',
+                'validity_unit' => 'Days',
                 'bandwidth_down' => '10M',
                 'bandwidth_up' => '5M',
                 'quota_bytes' => null,
@@ -408,6 +460,10 @@ class TenantDataSeeder extends Seeder
                 'max_devices' => 1,
                 'simultaneous_use' => 1,
                 'is_active' => true,
+                'router_name' => 'HS-MALL',
+                'pool' => 'pool-hotspot-a',
+                'prepaid' => true,
+                'enabled' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -418,7 +474,7 @@ class TenantDataSeeder extends Seeder
                 'type' => 'hotspot',
                 'price' => 75000,
                 'validity' => 30,
-                'validity_unit' => 'days',
+                'validity_unit' => 'Days',
                 'bandwidth_down' => '10M',
                 'bandwidth_up' => '5M',
                 'quota_bytes' => null,
@@ -427,6 +483,56 @@ class TenantDataSeeder extends Seeder
                 'max_devices' => 2,
                 'simultaneous_use' => 1,
                 'is_active' => true,
+                'router_name' => 'HS-MALL',
+                'pool' => 'pool-hotspot-a',
+                'prepaid' => true,
+                'enabled' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Hotspot 30 Menit',
+                'code' => 'HS-30MIN',
+                'description' => 'Voucher hotspot 30 menit',
+                'type' => 'hotspot',
+                'price' => 2000,
+                'validity' => 30,
+                'validity_unit' => 'Mins',
+                'bandwidth_down' => '5M',
+                'bandwidth_up' => '2M',
+                'quota_bytes' => 268435456,
+                'has_fup' => false,
+                'can_share' => false,
+                'max_devices' => 1,
+                'simultaneous_use' => 1,
+                'is_active' => true,
+                'router_name' => 'HS-CAFE',
+                'pool' => 'pool-hotspot-a',
+                'prepaid' => true,
+                'enabled' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Paket Bisnis 100 Mbps',
+                'code' => 'PKT-BISNIS-100',
+                'description' => 'Paket dedicated untuk kebutuhan bisnis',
+                'type' => 'pppoe',
+                'price' => 850000,
+                'validity' => 1,
+                'validity_unit' => 'Months',
+                'bandwidth_down' => '100M',
+                'bandwidth_up' => '50M',
+                'quota_bytes' => null,
+                'has_fup' => false,
+                'can_share' => true,
+                'max_devices' => 10,
+                'simultaneous_use' => 5,
+                'is_active' => true,
+                'router_name' => 'ROUTER-PUSAT',
+                'pool' => 'pool-pppoe-main',
+                'prepaid' => false,
+                'enabled' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -434,6 +540,40 @@ class TenantDataSeeder extends Seeder
 
         DB::connection('tenant')->table('service_plans')->insert($servicePlans);
         $this->command->info('Service plans created.');
+    }
+
+    protected function updateServicePlanRelations(): void
+    {
+        $bwIds = DB::connection('tenant')->table('bandwidth_profiles')->pluck('id', 'name_bw')->toArray();
+        $poolIds = DB::connection('tenant')->table('ip_pools')->pluck('id', 'pool_name')->toArray();
+        $pppoeProfileIds = DB::connection('tenant')->table('pppoe_profiles')->pluck('id', 'profile_name')->toArray();
+        $hotspotProfileIds = DB::connection('tenant')->table('hotspot_profiles')->pluck('id', 'profile_name')->toArray();
+
+        $pppoeUpdates = [
+            'PKT-HEMAT-5' => ['bandwidth_id' => $bwIds['bw-5m'] ?? null, 'pppoe_profile_id' => $pppoeProfileIds['pppoe-default'] ?? null, 'ip_pool_id' => $poolIds['pool-pppoe-main'] ?? null],
+            'PKT-REGULER-10' => ['bandwidth_id' => $bwIds['bw-10m'] ?? null, 'pppoe_profile_id' => $pppoeProfileIds['pppoe-default'] ?? null, 'ip_pool_id' => $poolIds['pool-pppoe-main'] ?? null],
+            'PKT-PREMIUM-20' => ['bandwidth_id' => $bwIds['bw-20m'] ?? null, 'pppoe_profile_id' => $pppoeProfileIds['pppoe-premium'] ?? null, 'ip_pool_id' => $poolIds['pool-pppoe-main'] ?? null],
+            'PKT-ULTRA-50' => ['bandwidth_id' => $bwIds['bw-50m'] ?? null, 'pppoe_profile_id' => $pppoeProfileIds['pppoe-ultra'] ?? null, 'ip_pool_id' => $poolIds['pool-pppoe-main'] ?? null],
+            'PKT-CAB-10' => ['bandwidth_id' => $bwIds['bw-10m'] ?? null, 'pppoe_profile_id' => $pppoeProfileIds['pppoe-default'] ?? null, 'ip_pool_id' => $poolIds['pool-pppoe-ext'] ?? null],
+            'PKT-BISNIS-100' => ['bandwidth_id' => $bwIds['bw-50m'] ?? null, 'pppoe_profile_id' => $pppoeProfileIds['pppoe-ultra'] ?? null, 'ip_pool_id' => $poolIds['pool-pppoe-main'] ?? null],
+        ];
+
+        $hotspotUpdates = [
+            'HS-30MIN' => ['bandwidth_id' => $bwIds['hs-basic'] ?? null, 'hotspot_profile_id' => $hotspotProfileIds['hs-basic'] ?? null, 'ip_pool_id' => $poolIds['pool-hotspot-a'] ?? null],
+            'HS-1JAM' => ['bandwidth_id' => $bwIds['hs-basic'] ?? null, 'hotspot_profile_id' => $hotspotProfileIds['hs-basic'] ?? null, 'ip_pool_id' => $poolIds['pool-hotspot-a'] ?? null],
+            'HS-3JAM' => ['bandwidth_id' => $bwIds['hs-basic'] ?? null, 'hotspot_profile_id' => $hotspotProfileIds['hs-standard'] ?? null, 'ip_pool_id' => $poolIds['pool-hotspot-a'] ?? null],
+            'HS-24JAM' => ['bandwidth_id' => $bwIds['hs-premium'] ?? null, 'hotspot_profile_id' => $hotspotProfileIds['hs-standard'] ?? null, 'ip_pool_id' => $poolIds['pool-hotspot-a'] ?? null],
+            'HS-7HARI' => ['bandwidth_id' => $bwIds['hs-premium'] ?? null, 'hotspot_profile_id' => $hotspotProfileIds['hs-premium'] ?? null, 'ip_pool_id' => $poolIds['pool-hotspot-a'] ?? null],
+            'HS-30HARI' => ['bandwidth_id' => $bwIds['hs-premium'] ?? null, 'hotspot_profile_id' => $hotspotProfileIds['hs-premium'] ?? null, 'ip_pool_id' => $poolIds['pool-hotspot-a'] ?? null],
+        ];
+
+        foreach (array_merge($pppoeUpdates, $hotspotUpdates) as $code => $data) {
+            DB::connection('tenant')->table('service_plans')
+                ->where('code', $code)
+                ->update($data);
+        }
+
+        $this->command->info('Service plan relations updated.');
     }
 
     protected function seedNas(): void
