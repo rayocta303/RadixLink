@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tenant;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\TenantUser;
 use App\Models\Tenant\TenantRole;
+use App\Services\TenantDatabaseManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -13,18 +14,35 @@ class UserController extends Controller
 {
     public function index()
     {
+        if (!TenantDatabaseManager::isConnected()) {
+            return view('tenant.users.index', [
+                'users' => collect(),
+                'dbError' => 'Database tenant belum dikonfigurasi. Silakan hubungi administrator.',
+            ]);
+        }
+        
         $users = TenantUser::with('roles')->get();
         return view('tenant.users.index', compact('users'));
     }
 
     public function create()
     {
+        if (!TenantDatabaseManager::isConnected()) {
+            return redirect()->route('tenant.users.index')
+                ->with('error', 'Database tenant belum dikonfigurasi.');
+        }
+        
         $roles = TenantRole::all();
         return view('tenant.users.create', compact('roles'));
     }
 
     public function store(Request $request)
     {
+        if (!TenantDatabaseManager::isConnected()) {
+            return redirect()->route('tenant.users.index')
+                ->with('error', 'Database tenant belum dikonfigurasi.');
+        }
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:tenant.users,email',
@@ -48,12 +66,22 @@ class UserController extends Controller
 
     public function show(TenantUser $user)
     {
+        if (!TenantDatabaseManager::isConnected()) {
+            return redirect()->route('tenant.users.index')
+                ->with('error', 'Database tenant belum dikonfigurasi.');
+        }
+        
         $user->load('roles');
         return view('tenant.users.show', compact('user'));
     }
 
     public function edit(TenantUser $user)
     {
+        if (!TenantDatabaseManager::isConnected()) {
+            return redirect()->route('tenant.users.index')
+                ->with('error', 'Database tenant belum dikonfigurasi.');
+        }
+        
         $user->load('roles');
         $roles = TenantRole::all();
         return view('tenant.users.edit', compact('user', 'roles'));
@@ -61,6 +89,11 @@ class UserController extends Controller
 
     public function update(Request $request, TenantUser $user)
     {
+        if (!TenantDatabaseManager::isConnected()) {
+            return redirect()->route('tenant.users.index')
+                ->with('error', 'Database tenant belum dikonfigurasi.');
+        }
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:tenant.users,email,' . $user->id,
@@ -87,6 +120,11 @@ class UserController extends Controller
 
     public function destroy(TenantUser $user)
     {
+        if (!TenantDatabaseManager::isConnected()) {
+            return redirect()->route('tenant.users.index')
+                ->with('error', 'Database tenant belum dikonfigurasi.');
+        }
+        
         $tenantUser = session('tenant_user');
         
         if ($user->id === $tenantUser->id) {
