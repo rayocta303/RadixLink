@@ -293,9 +293,9 @@
                                                 </span>
                                                 @endif
                                                 <div class="text-sm font-bold text-gray-900">{{ $plan->name }}</div>
-                                                @if($plan->description)
+                                                <!-- @if($plan->description)
                                                 <div class="text-[10px] text-gray-500 leading-tight">{{ $plan->description }}</div>
-                                                @endif
+                                                @endif -->
                                                 <div class="mt-2">
                                                     <div class="text-xl font-bold text-gray-900">Rp {{ number_format($plan->price_monthly / 1000, 0) }}K</div>
                                                     <div class="text-[10px] text-gray-600">/bulan</div>
