@@ -85,7 +85,7 @@
         <table id="activityLogsTable" class="w-full stripe hover">
             <thead>
                 <tr>
-                    <th class="no-sort w-8"></th>
+                    <th class="no-sort w-8" data-orderable="false"></th>
                     <th>Pengguna</th>
                     <th>Aksi</th>
                     <th>Entitas</th>
@@ -238,14 +238,20 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-    $('#activityLogsTable').DataTable({
+    var table = $('#activityLogsTable').DataTable({
         paging: false,
         info: false,
         searching: true,
         columnDefs: [
-            { targets: 'no-sort', orderable: false }
+            { targets: 0, orderable: false }
         ],
-        order: [[5, 'desc']]
+        order: [[5, 'desc']],
+        rowCallback: function(row, data, index) {
+            // Skip detail rows from DataTables processing
+            if ($(row).hasClass('details-row')) {
+                return false;
+            }
+        }
     });
 
     $(document).on('click', '.toggle-details', function() {
