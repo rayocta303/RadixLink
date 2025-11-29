@@ -1,0 +1,211 @@
+5. RADIUS Authentication Flow
+Unable to render rich display
+
+sequenceDiagram
+    participant C as Customer Device
+    participant R as MikroTik Router
+    participant F as FreeRADIUS
+    participant DB as Tenant Database
+    
+    C->>R: Connection Request
+    R->>F: Access-Request (username, password)
+    
+    F->>DB: Query radcheck table
+    DB-->>F: User credentials
+    
+    alt Password Match
+        F->>DB: Query radreply table
+        DB-->>F: Reply attributes
+        F->>DB: Query radusergroup
+        DB-->>F: Group membership
+        F-->>R: Access-Accept + Attributes
+        R-->>C: Connection Granted
+        
+        Note over R,F: Session Started
+        R->>F: Accounting-Start
+        F->>DB: Insert radacct record
+        
+        loop Every Interval
+            R->>F: Accounting-Update
+            F->>DB: Update radacct
+        end
+        
+        R->>F: Accounting-Stop
+        F->>DB: Complete radacct record
+    else Password Mismatch
+        F-->>R: Access-Reject
+        R-->>C: Connection Denied
+        F->>DB: Log to radpostauth
+    end
+6. Invoice & Payment Flow
+Unable to render rich display
+
+Could not find a suitable point for the given distance
+
+For more information, see https://docs.github.com/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams#creating-mermaid-diagrams
+
+flowchart TD
+    A[Service Period Ends] --> B[System Generates Invoice]
+    B --> C[Calculate Amount]
+    C --> D[Apply Tax if Any]
+    D --> E[Create Invoice Record]
+    E --> F[Send Notification to Customer]
+    
+    F --> G{Customer Pays?}
+    
+    G -->|Online Payment| H[Process Payment Gateway]
+    H --> I{Payment Success?}
+    I -->|Yes| J[Record Payment]
+    I -->|No| K[Mark as Failed]
+    K --> G
+    
+    G -->|Manual Payment| L[Admin Records Payment]
+    L --> J
+    
+    J --> M[Update Invoice Status: Paid]
+    M --> N[Extend Service Period]
+    N --> O[Update Customer Expiry]
+    O --> P[Sync to RADIUS]
+    P --> Q[Log Transaction]
+    Q --> R[Send Receipt]
+    
+    G -->|No Payment| S{Due Date Passed?}
+    S -->|No| G
+    S -->|Yes| T[Mark as Overdue]
+    T --> U[Send Reminder]
+    U --> V{Grace Period Expired?}
+    V -->|No| G
+    V -->|Yes| W[Suspend Customer]
+    W --> X[Remove from RADIUS]
+7. Router Script Generation Flow
+Unable to render rich display
+
+Could not find a suitable point for the given distance
+
+For more information, see https://docs.github.com/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams#creating-mermaid-diagrams
+
+flowchart TD
+    A[Admin Selects Script Type] --> B{Script Type?}
+    
+    B -->|Full Config| C[Generate Complete Setup]
+    B -->|RADIUS Only| D[Generate RADIUS Config]
+    B -->|PPPoE Server| E[Generate PPPoE Config]
+    B -->|Hotspot Server| F[Generate Hotspot Config]
+    B -->|Firewall| G[Generate Firewall Rules]
+    
+    C --> H[Include All Components]
+    
+    D --> I[RADIUS Client Settings]
+    I --> J[Authentication Settings]
+    
+    E --> K[PPPoE Server Settings]
+    K --> L[PPPoE Profiles]
+    L --> M[IP Pool Assignment]
+    
+    F --> N[Hotspot Server Settings]
+    N --> O[Hotspot Profiles]
+    O --> P[Walled Garden]
+    P --> Q[Login Page Settings]
+    
+    G --> R[NAT Rules]
+    R --> S[Filter Rules]
+    S --> T[Mangle Rules]
+    
+    H --> U[Compile Script]
+    J --> U
+    M --> U
+    Q --> U
+    T --> U
+    
+    U --> V[Display Script]
+    V --> W{Action?}
+    
+    W -->|Copy| X[Copy to Clipboard]
+    W -->|Download| Y[Download .rsc File]
+    W -->|API Push| Z[Push to Router via API]
+    
+    Z --> AA{Push Success?}
+    AA -->|Yes| AB[Confirm Applied]
+    AA -->|No| AC[Show Error]
+8. Report Generation Flow
+Unable to render rich display
+
+Could not find a suitable point for the given distance
+
+For more information, see https://docs.github.com/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams#creating-mermaid-diagrams
+
+flowchart TD
+    A[Admin Opens Reports] --> B[Select Report Type]
+    
+    B -->|Revenue| C[Revenue Report]
+    B -->|Customer| D[Customer Report]
+    B -->|Sales| E[Sales Report]
+    
+    C --> F[Select Date Range]
+    D --> F
+    E --> F
+    
+    F --> G[Query Database]
+    G --> H[Aggregate Data]
+    H --> I[Calculate Metrics]
+    
+    I --> J[Generate Charts]
+    J --> K[Display Dashboard]
+    
+    K --> L{Export?}
+    L -->|PDF| M[Generate PDF Report]
+    L -->|Excel| N[Generate Excel File]
+    L -->|No| O[View Only]
+    
+    M --> P[Download File]
+    N --> P
+    O --> Q[End]
+    P --> Q
+Role & Permission
+Platform Roles
+Unable to render rich display
+
+Could not find a suitable point for the given distance
+
+For more information, see https://docs.github.com/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams#creating-mermaid-diagrams
+
+graph TD
+    subgraph Platform["Platform Level Roles"]
+        SA[Super Admin]
+        PA[Platform Admin]
+        PS[Platform Support]
+        PC[Platform Cashier]
+        PT[Platform Technician]
+    end
+    
+    SA -->|Full Access| ALL[All Platform Features]
+    PA -->|Manage| TEN[Tenants & Subscriptions]
+    PA -->|Manage| USR[Platform Users]
+    PS -->|Handle| TKT[Support Tickets]
+    PC -->|Manage| INV[Platform Invoices]
+    PT -->|Monitor| MON[System Monitoring]
+Tenant Roles
+Unable to render rich display
+
+Could not find a suitable point for the given distance
+
+For more information, see https://docs.github.com/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams#creating-mermaid-diagrams
+
+graph TD
+    subgraph Tenant["Tenant Level Roles"]
+        OW[Owner]
+        AD[Admin]
+        TE[Technician]
+        CA[Cashier]
+        RE[Reseller]
+    end
+    
+    OW -->|Full Access| ALL2[All Tenant Features]
+    AD -->|Manage| USR2[Users & Customers]
+    AD -->|Manage| NAS[NAS Devices]
+    TE -->|Configure| NET[Network Settings]
+    TE -->|Generate| SCR[Router Scripts]
+    CA -->|Process| PAY[Payments & Invoices]
+    CA -->|Generate| VOU[Vouchers]
+    RE -->|Sell| VOU2[Vouchers Only]
+    RE -->|View| BAL[Own Balance & Sales]
