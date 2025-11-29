@@ -571,7 +571,7 @@ sequenceDiagram
     participant DB as Tenant Database
     
     C->>R: Connection Request
-    R->>F: Access-Request (username, password)
+    R->>F: Access-Request
     
     F->>DB: Query radcheck table
     DB-->>F: User credentials
@@ -581,7 +581,7 @@ sequenceDiagram
         DB-->>F: Reply attributes
         F->>DB: Query radusergroup
         DB-->>F: Group membership
-        F-->>R: Access-Accept + Attributes
+        F-->>R: Access-Accept
         R-->>C: Connection Granted
         
         Note over R,F: Session Started
@@ -606,118 +606,122 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-    A[Service Period Ends] --> B[System Generates Invoice]
-    B --> C[Calculate Amount]
-    C --> D[Apply Tax if Any]
-    D --> E[Create Invoice Record]
-    E --> F[Send Notification to Customer]
+    A[Service Period Ends]
+    B[System Generates Invoice]
+    C[Calculate Amount]
+    D[Apply Tax]
+    E[Create Invoice Record]
+    F[Send Notification]
+    G{Customer Pays?}
+    H[Process Payment Gateway]
+    I{Payment Success?}
+    J[Record Payment]
+    K[Mark as Failed]
+    L[Admin Records Payment]
+    M[Update Invoice Status]
+    N[Extend Service Period]
+    O[Update Customer Expiry]
+    P[Sync to RADIUS]
+    Q[Log Transaction]
+    R[Send Receipt]
+    S{Due Date Passed?}
+    T[Mark as Overdue]
+    U[Send Reminder]
+    V{Grace Period Expired?}
+    W[Suspend Customer]
+    X[Remove from RADIUS]
     
-    F --> G{Customer Pays?}
-    
-    G -->|Online Payment| H[Process Payment Gateway]
-    H --> I{Payment Success?}
-    I -->|Yes| J[Record Payment]
-    I -->|No| K[Mark as Failed]
-    K --> G
-    
-    G -->|Manual Payment| L[Admin Records Payment]
-    L --> J
-    
-    J --> M[Update Invoice Status: Paid]
-    M --> N[Extend Service Period]
-    N --> O[Update Customer Expiry]
-    O --> P[Sync to RADIUS]
-    P --> Q[Log Transaction]
-    Q --> R[Send Receipt]
-    
-    G -->|No Payment| S{Due Date Passed?}
+    A --> B --> C --> D --> E --> F --> G
+    G -->|Online| H --> I
+    I -->|Yes| J
+    I -->|No| K --> G
+    G -->|Manual| L --> J
+    J --> M --> N --> O --> P --> Q --> R
+    G -->|No Payment| S
     S -->|No| G
-    S -->|Yes| T[Mark as Overdue]
-    T --> U[Send Reminder]
-    U --> V{Grace Period Expired?}
+    S -->|Yes| T --> U --> V
     V -->|No| G
-    V -->|Yes| W[Suspend Customer]
-    W --> X[Remove from RADIUS]
+    V -->|Yes| W --> X
 ```
 
 ### 7. Router Script Generation Flow
 
 ```mermaid
-flowchart TD
-    A[Admin Selects Script Type] --> B{Script Type?}
+flowchart LR
+    A[Admin Selects Type]
+    B{Script Type?}
+    C[Full Config]
+    D[RADIUS Config]
+    E[PPPoE Config]
+    F[Hotspot Config]
+    G[Firewall Rules]
+    H[Include All]
+    I[RADIUS Settings]
+    J[Auth Settings]
+    K[PPPoE Settings]
+    L[PPPoE Profiles]
+    M[IP Pool]
+    N[Hotspot Settings]
+    O[Profiles]
+    P[Walled Garden]
+    Q[Login Page]
+    R[NAT Rules]
+    S[Filter Rules]
+    T[Mangle Rules]
+    U[Compile Script]
+    V[Display Script]
+    W{Action?}
+    X[Copy]
+    Y[Download]
+    Z[API Push]
+    AA{Success?}
+    AB[Confirmed]
+    AC[Error]
     
-    B -->|Full Config| C[Generate Complete Setup]
-    B -->|RADIUS Only| D[Generate RADIUS Config]
-    B -->|PPPoE Server| E[Generate PPPoE Config]
-    B -->|Hotspot Server| F[Generate Hotspot Config]
-    B -->|Firewall| G[Generate Firewall Rules]
-    
-    C --> H[Include All Components]
-    
-    D --> I[RADIUS Client Settings]
-    I --> J[Authentication Settings]
-    
-    E --> K[PPPoE Server Settings]
-    K --> L[PPPoE Profiles]
-    L --> M[IP Pool Assignment]
-    
-    F --> N[Hotspot Server Settings]
-    N --> O[Hotspot Profiles]
-    O --> P[Walled Garden]
-    P --> Q[Login Page Settings]
-    
-    G --> R[NAT Rules]
-    R --> S[Filter Rules]
-    S --> T[Mangle Rules]
-    
-    H --> U[Compile Script]
-    J --> U
-    M --> U
-    Q --> U
-    T --> U
-    
-    U --> V[Display Script]
-    V --> W{Action?}
-    
-    W -->|Copy| X[Copy to Clipboard]
-    W -->|Download| Y[Download .rsc File]
-    W -->|API Push| Z[Push to Router via API]
-    
-    Z --> AA{Push Success?}
-    AA -->|Yes| AB[Confirm Applied]
-    AA -->|No| AC[Show Error]
+    A --> B
+    B -->|Full| C --> H --> U
+    B -->|RADIUS| D --> I --> J --> U
+    B -->|PPPoE| E --> K --> L --> M --> U
+    B -->|Hotspot| F --> N --> O --> P --> Q --> U
+    B -->|Firewall| G --> R --> S --> T --> U
+    U --> V --> W
+    W -->|Copy| X
+    W -->|Download| Y
+    W -->|API| Z --> AA
+    AA -->|Yes| AB
+    AA -->|No| AC
 ```
 
 ### 8. Report Generation Flow
 
 ```mermaid
 flowchart TD
-    A[Admin Opens Reports] --> B[Select Report Type]
+    A[Admin Opens Reports]
+    B[Select Report Type]
+    C[Revenue Report]
+    D[Customer Report]
+    E[Sales Report]
+    F[Select Date Range]
+    G[Query Database]
+    H[Aggregate Data]
+    I[Calculate Metrics]
+    J[Generate Charts]
+    K[Display Dashboard]
+    L{Export?}
+    M[Generate PDF]
+    N[Generate Excel]
+    O[View Only]
+    P[Download File]
+    Q[End]
     
-    B -->|Revenue| C[Revenue Report]
-    B -->|Customer| D[Customer Report]
-    B -->|Sales| E[Sales Report]
-    
-    C --> F[Select Date Range]
-    D --> F
-    E --> F
-    
-    F --> G[Query Database]
-    G --> H[Aggregate Data]
-    H --> I[Calculate Metrics]
-    
-    I --> J[Generate Charts]
-    J --> K[Display Dashboard]
-    
-    K --> L{Export?}
-    L -->|PDF| M[Generate PDF Report]
-    L -->|Excel| N[Generate Excel File]
-    L -->|No| O[View Only]
-    
-    M --> P[Download File]
-    N --> P
-    O --> Q[End]
-    P --> Q
+    A --> B
+    B -->|Revenue| C --> F
+    B -->|Customer| D --> F
+    B -->|Sales| E --> F
+    F --> G --> H --> I --> J --> K --> L
+    L -->|PDF| M --> P --> Q
+    L -->|Excel| N --> P
+    L -->|No| O --> Q
 ```
 
 ---
@@ -727,44 +731,55 @@ flowchart TD
 ### Platform Roles
 
 ```mermaid
-graph TD
-    subgraph Platform["Platform Level Roles"]
-        SA[Super Admin]
-        PA[Platform Admin]
-        PS[Platform Support]
-        PC[Platform Cashier]
-        PT[Platform Technician]
-    end
+graph LR
+    SA[Super Admin]
+    PA[Platform Admin]
+    PS[Platform Support]
+    PC[Platform Cashier]
+    PT[Platform Technician]
+    ALL[All Features]
+    TEN[Tenants]
+    USR[Users]
+    TKT[Tickets]
+    INV[Invoices]
+    MON[Monitoring]
     
-    SA -->|Full Access| ALL[All Platform Features]
-    PA -->|Manage| TEN[Tenants & Subscriptions]
-    PA -->|Manage| USR[Platform Users]
-    PS -->|Handle| TKT[Support Tickets]
-    PC -->|Manage| INV[Platform Invoices]
-    PT -->|Monitor| MON[System Monitoring]
+    SA -->|Full Access| ALL
+    PA -->|Manage| TEN
+    PA -->|Manage| USR
+    PS -->|Handle| TKT
+    PC -->|Manage| INV
+    PT -->|Monitor| MON
 ```
 
 ### Tenant Roles
 
 ```mermaid
-graph TD
-    subgraph Tenant["Tenant Level Roles"]
-        OW[Owner]
-        AD[Admin]
-        TE[Technician]
-        CA[Cashier]
-        RE[Reseller]
-    end
+graph LR
+    OW[Owner]
+    AD[Admin]
+    TE[Technician]
+    CA[Cashier]
+    RE[Reseller]
+    ALL2[All Features]
+    USR2[Users]
+    NAS[NAS Devices]
+    NET[Network]
+    SCR[Scripts]
+    PAY[Payments]
+    VOU[Vouchers]
+    VOU2[Voucher Sales]
+    BAL[Balance]
     
-    OW -->|Full Access| ALL2[All Tenant Features]
-    AD -->|Manage| USR2[Users & Customers]
-    AD -->|Manage| NAS[NAS Devices]
-    TE -->|Configure| NET[Network Settings]
-    TE -->|Generate| SCR[Router Scripts]
-    CA -->|Process| PAY[Payments & Invoices]
-    CA -->|Generate| VOU[Vouchers]
-    RE -->|Sell| VOU2[Vouchers Only]
-    RE -->|View| BAL[Own Balance & Sales]
+    OW -->|Full Access| ALL2
+    AD -->|Manage| USR2
+    AD -->|Manage| NAS
+    TE -->|Configure| NET
+    TE -->|Generate| SCR
+    CA -->|Process| PAY
+    CA -->|Generate| VOU
+    RE -->|Sell| VOU2
+    RE -->|View| BAL
 ```
 
 ### Permission Matrix
