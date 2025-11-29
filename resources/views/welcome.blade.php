@@ -258,161 +258,165 @@
     </section>
 
     <!-- Pricing Section -->
-    <section id="pricing" class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+    <section id="pricing" class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div class="mx-auto max-w-7xl">
-            <div class="text-center mb-16">
-                <div class="inline-flex items-center px-3 py-1 rounded-full bg-primary-50 text-primary-700 text-sm font-medium mb-4">
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center px-2.5 py-1 rounded-full bg-primary-50 text-primary-700 text-xs font-medium mb-3">
                     Harga Terjangkau
                 </div>
-                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
                     Pilih Paket yang Sesuai untuk Bisnis Anda
                 </h2>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                <p class="text-base text-gray-600 max-w-2xl mx-auto">
                     Mulai gratis 14 hari, upgrade kapan saja sesuai kebutuhan
                 </p>
             </div>
             
             @if($plans->isNotEmpty())
             <!-- Pricing Table -->
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
+            <div class="bg-white rounded-xl shadow-xl overflow-hidden max-w-6xl mx-auto">
                 <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="bg-gray-50 border-b border-gray-200">
-                                <th class="px-6 py-4 text-left">
-                                    <span class="text-sm font-semibold text-gray-900">Fitur</span>
-                                </th>
-                                @foreach($plans as $plan)
-                                <th class="px-6 py-4 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50' : '' }}">
-                                    <div class="space-y-2">
-                                        @if($plan->slug === 'cloud-special')
-                                        <span class="inline-block bg-primary-600 text-white px-3 py-1 rounded-full text-xs font-semibold mb-2">
-                                            Paling Populer
-                                        </span>
-                                        @endif
-                                        <div class="text-lg font-bold text-gray-900">{{ $plan->name }}</div>
-                                        @if($plan->description)
-                                        <div class="text-xs text-gray-500">{{ $plan->description }}</div>
-                                        @endif
-                                        <div class="mt-4">
-                                            <span class="text-3xl font-bold text-gray-900">Rp {{ number_format($plan->price_monthly, 0, ',', '.') }}</span>
-                                            <span class="text-gray-600 text-sm">/bulan</span>
-                                        </div>
-                                    </div>
-                                </th>
-                                @endforeach
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            <!-- Router Limit -->
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm font-medium text-gray-900">Maksimal Router</td>
-                                @foreach($plans as $plan)
-                                <td class="px-6 py-4 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
-                                    <span class="text-sm font-semibold text-gray-900">
-                                        {{ $plan->max_routers >= 999 ? 'Unlimited' : $plan->max_routers }}
-                                    </span>
-                                </td>
-                                @endforeach
-                            </tr>
-                            
-                            <!-- User Limit -->
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm font-medium text-gray-900">Maksimal User</td>
-                                @foreach($plans as $plan)
-                                <td class="px-6 py-4 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
-                                    <span class="text-sm font-semibold text-gray-900">
-                                        {{ $plan->max_users >= 999999 ? 'Unlimited' : number_format($plan->max_users) }}
-                                    </span>
-                                </td>
-                                @endforeach
-                            </tr>
-                            
-                            <!-- Voucher Limit -->
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm font-medium text-gray-900">Maksimal Voucher</td>
-                                @foreach($plans as $plan)
-                                <td class="px-6 py-4 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
-                                    <span class="text-sm font-semibold text-gray-900">
-                                        {{ $plan->max_vouchers >= 999999 ? 'Unlimited' : number_format($plan->max_vouchers) }}
-                                    </span>
-                                </td>
-                                @endforeach
-                            </tr>
-                            
-                            <!-- Custom Domain -->
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm font-medium text-gray-900">Custom Domain</td>
-                                @foreach($plans as $plan)
-                                <td class="px-6 py-4 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
-                                    @if($plan->custom_domain)
-                                    <svg class="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
-                                    @else
-                                    <svg class="w-5 h-5 text-gray-300 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                    </svg>
-                                    @endif
-                                </td>
-                                @endforeach
-                            </tr>
-                            
-                            <!-- API Access -->
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm font-medium text-gray-900">API Access</td>
-                                @foreach($plans as $plan)
-                                <td class="px-6 py-4 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
-                                    @if($plan->api_access)
-                                    <svg class="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
-                                    @else
-                                    <svg class="w-5 h-5 text-gray-300 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                    </svg>
-                                    @endif
-                                </td>
-                                @endforeach
-                            </tr>
-                            
-                            <!-- Priority Support -->
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm font-medium text-gray-900">Priority Support</td>
-                                @foreach($plans as $plan)
-                                <td class="px-6 py-4 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
-                                    @if($plan->priority_support)
-                                    <svg class="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
-                                    @else
-                                    <svg class="w-5 h-5 text-gray-300 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                    </svg>
-                                    @endif
-                                </td>
-                                @endforeach
-                            </tr>
-                            
-                            <!-- CTA Row -->
-                            <tr class="bg-gray-50">
-                                <td class="px-6 py-6"></td>
-                                @foreach($plans as $plan)
-                                <td class="px-6 py-6 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/50' : '' }}">
-                                    <a href="{{ route('register') }}" class="inline-block w-full px-6 py-3 text-sm font-semibold rounded-lg transition-colors {{ $plan->slug === 'cloud-special' ? 'text-white bg-primary-600 hover:bg-primary-700' : 'text-primary-600 bg-white border-2 border-primary-600 hover:bg-primary-50' }}">
-                                        Mulai Gratis
-                                    </a>
-                                </td>
-                                @endforeach
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="inline-block min-w-full align-middle">
+                        <div class="overflow-hidden">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr class="bg-gray-50">
+                                        <th scope="col" class="sticky left-0 z-10 bg-gray-50 px-4 py-3 text-left border-r border-gray-200">
+                                            <span class="text-xs font-semibold text-gray-900">Fitur</span>
+                                        </th>
+                                        @foreach($plans as $plan)
+                                        <th scope="col" class="px-4 py-3 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50' : '' }} min-w-[140px]">
+                                            <div class="space-y-1.5">
+                                                @if($plan->slug === 'cloud-special')
+                                                <span class="inline-block bg-primary-600 text-white px-2 py-0.5 rounded-full text-[10px] font-semibold mb-1">
+                                                    Paling Populer
+                                                </span>
+                                                @endif
+                                                <div class="text-sm font-bold text-gray-900">{{ $plan->name }}</div>
+                                                @if($plan->description)
+                                                <div class="text-[10px] text-gray-500 leading-tight">{{ $plan->description }}</div>
+                                                @endif
+                                                <div class="mt-2">
+                                                    <div class="text-xl font-bold text-gray-900">Rp {{ number_format($plan->price_monthly / 1000, 0) }}K</div>
+                                                    <div class="text-[10px] text-gray-600">/bulan</div>
+                                                </div>
+                                            </div>
+                                        </th>
+                                        @endforeach
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 bg-white">
+                                    <!-- Router Limit -->
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="sticky left-0 z-10 bg-white hover:bg-gray-50 px-4 py-2.5 text-xs font-medium text-gray-900 border-r border-gray-200 whitespace-nowrap">Maksimal Router</td>
+                                        @foreach($plans as $plan)
+                                        <td class="px-4 py-2.5 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
+                                            <span class="text-xs font-semibold text-gray-900">
+                                                {{ $plan->max_routers >= 999 ? 'Unlimited' : $plan->max_routers }}
+                                            </span>
+                                        </td>
+                                        @endforeach
+                                    </tr>
+                                    
+                                    <!-- User Limit -->
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="sticky left-0 z-10 bg-white hover:bg-gray-50 px-4 py-2.5 text-xs font-medium text-gray-900 border-r border-gray-200 whitespace-nowrap">Maksimal User</td>
+                                        @foreach($plans as $plan)
+                                        <td class="px-4 py-2.5 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
+                                            <span class="text-xs font-semibold text-gray-900">
+                                                {{ $plan->max_users >= 999999 ? 'Unlimited' : number_format($plan->max_users) }}
+                                            </span>
+                                        </td>
+                                        @endforeach
+                                    </tr>
+                                    
+                                    <!-- Voucher Limit -->
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="sticky left-0 z-10 bg-white hover:bg-gray-50 px-4 py-2.5 text-xs font-medium text-gray-900 border-r border-gray-200 whitespace-nowrap">Maksimal Voucher</td>
+                                        @foreach($plans as $plan)
+                                        <td class="px-4 py-2.5 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
+                                            <span class="text-xs font-semibold text-gray-900">
+                                                {{ $plan->max_vouchers >= 999999 ? 'Unlimited' : number_format($plan->max_vouchers) }}
+                                            </span>
+                                        </td>
+                                        @endforeach
+                                    </tr>
+                                    
+                                    <!-- Custom Domain -->
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="sticky left-0 z-10 bg-white hover:bg-gray-50 px-4 py-2.5 text-xs font-medium text-gray-900 border-r border-gray-200 whitespace-nowrap">Custom Domain</td>
+                                        @foreach($plans as $plan)
+                                        <td class="px-4 py-2.5 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
+                                            @if($plan->custom_domain)
+                                            <svg class="w-4 h-4 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            @else
+                                            <svg class="w-4 h-4 text-gray-300 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                            </svg>
+                                            @endif
+                                        </td>
+                                        @endforeach
+                                    </tr>
+                                    
+                                    <!-- API Access -->
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="sticky left-0 z-10 bg-white hover:bg-gray-50 px-4 py-2.5 text-xs font-medium text-gray-900 border-r border-gray-200 whitespace-nowrap">API Access</td>
+                                        @foreach($plans as $plan)
+                                        <td class="px-4 py-2.5 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
+                                            @if($plan->api_access)
+                                            <svg class="w-4 h-4 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            @else
+                                            <svg class="w-4 h-4 text-gray-300 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                            </svg>
+                                            @endif
+                                        </td>
+                                        @endforeach
+                                    </tr>
+                                    
+                                    <!-- Priority Support -->
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="sticky left-0 z-10 bg-white hover:bg-gray-50 px-4 py-2.5 text-xs font-medium text-gray-900 border-r border-gray-200 whitespace-nowrap">Priority Support</td>
+                                        @foreach($plans as $plan)
+                                        <td class="px-4 py-2.5 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
+                                            @if($plan->priority_support)
+                                            <svg class="w-4 h-4 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            @else
+                                            <svg class="w-4 h-4 text-gray-300 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                            </svg>
+                                            @endif
+                                        </td>
+                                        @endforeach
+                                    </tr>
+                                    
+                                    <!-- CTA Row -->
+                                    <tr class="bg-gray-50">
+                                        <td class="sticky left-0 z-10 bg-gray-50 px-4 py-4 border-r border-gray-200"></td>
+                                        @foreach($plans as $plan)
+                                        <td class="px-4 py-4 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/50' : '' }}">
+                                            <a href="{{ route('register') }}" class="inline-block w-full px-4 py-2 text-xs font-semibold rounded-lg transition-colors {{ $plan->slug === 'cloud-special' ? 'text-white bg-primary-600 hover:bg-primary-700' : 'text-primary-600 bg-white border-2 border-primary-600 hover:bg-primary-50' }}">
+                                                Mulai Gratis
+                                            </a>
+                                        </td>
+                                        @endforeach
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
             
             <!-- Additional Info -->
-            <div class="mt-8 text-center">
-                <p class="text-sm text-gray-600">
+            <div class="mt-6 text-center">
+                <p class="text-xs text-gray-600">
                     Semua paket termasuk: Multi-NAS Support, Voucher Generator, Payment Gateway, Multi-Tenant System, Role Management & Real-time Analytics
                 </p>
             </div>
