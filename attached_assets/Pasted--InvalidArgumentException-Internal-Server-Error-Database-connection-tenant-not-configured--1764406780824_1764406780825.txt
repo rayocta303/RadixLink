@@ -1,0 +1,124 @@
+# InvalidArgumentException - Internal Server Error
+
+Database connection [tenant] not configured.
+
+PHP 8.4.10
+Laravel 12.40.2
+7bf9e9e1-a727-4242-9944-f64d22c99dbd-00-1u0ye8r9iid30.sisko.replit.dev
+
+## Stack Trace
+
+0 - vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:221
+1 - vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:187
+2 - vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:102
+3 - vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1980
+4 - vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1946
+5 - vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1713
+6 - vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1611
+7 - vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1647
+8 - vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1600
+9 - vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1590
+10 - vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:783
+11 - app/Http/Controllers/Tenant/UserController.php:16
+12 - vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php:46
+13 - vendor/laravel/framework/src/Illuminate/Routing/Route.php:265
+14 - vendor/laravel/framework/src/Illuminate/Routing/Route.php:211
+15 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:822
+16 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+17 - app/Http/Middleware/CheckTenantRole.php:58
+18 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+19 - app/Http/Middleware/TenantUserMiddleware.php:43
+20 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+21 - vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php:50
+22 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+23 - vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php:63
+24 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+25 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/VerifyCsrfToken.php:87
+26 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+27 - vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php:48
+28 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+29 - vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php:120
+30 - vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php:63
+31 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+32 - vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php:36
+33 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+34 - vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php:74
+35 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+36 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+37 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:821
+38 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:800
+39 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:764
+40 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:753
+41 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:200
+42 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+43 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php:21
+44 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php:31
+45 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+46 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php:21
+47 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php:51
+48 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+49 - vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php:27
+50 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+51 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php:109
+52 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+53 - vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php:48
+54 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+55 - vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php:58
+56 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+57 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php:22
+58 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+59 - vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php:26
+60 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+61 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+62 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:175
+63 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:144
+64 - vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1220
+65 - public/index.php:20
+66 - vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php:23
+
+## Request
+
+GET /tenant/users
+
+## Headers
+
+* **host**: 7bf9e9e1-a727-4242-9944-f64d22c99dbd-00-1u0ye8r9iid30.sisko.replit.dev
+* **user-agent**: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+* **accept**: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+* **accept-encoding**: gzip, deflate, br, zstd
+* **accept-language**: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7
+* **cookie**: XSRF-TOKEN=eyJpdiI6IjBXM1drMVNISFFOTzlFNm45czBVVWc9PSIsInZhbHVlIjoiczlXWlp1ZmxvY3NmT2hiL2dNZXV3VnFDaTFpVWM1UC83QUg1cTRtcUZjSFpsbXBKSUQ3czJ4UTgycmhjbmgyRzM2MjhweElsaUdHc29ldnZkNmk3OTVxRkEyT1dLakV2eS9WNjI3bFpBUjYvektwTG1BWFdQd01BcXA3dFMvVlYiLCJtYWMiOiIxYzY5NTM5MGE2N2JjMzM1ZmM2Mjg4OTNmYzRlNjU1YzFmZGJjMjEwZWY1YTM3NmZkNmI5NGM4M2UyYWRlYmE3IiwidGFnIjoiIn0%3D; isp-manager-saas-session=eyJpdiI6IllnSzdyampBU1FYdWJ4RnV2ZC9pQ2c9PSIsInZhbHVlIjoiY1dnd3ZGZDJpQmNGMVYxUU5mc2owQkc2SStXYnlwbHREUVQ0WldDQ1c5cWdwUnZWQ3hjZjE0NlBRZjZNL1piKzJzb0tiU3I5MnNaZm1iOTAzSG92b3V1SGNwNHlxdnZneDljejlnRHc4MS9yalQ2SEN5cVBnUWhxNndjZkdaZkwiLCJtYWMiOiJlZTE4MWE3NDQzNmYzYjVkNmMyOWE0NGQwNzFlMzY2YzBhMDYwYjJhMTEzMjM4NWJjNDZlODIxMjE1ZDk1YzcwIiwidGFnIjoiIn0%3D
+* **referer**: https://7bf9e9e1-a727-4242-9944-f64d22c99dbd-00-1u0ye8r9iid30.sisko.replit.dev/tenant/reports
+* **sec-ch-ua**: "Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"
+* **sec-ch-ua-mobile**: ?0
+* **sec-ch-ua-platform**: "Windows"
+* **sec-fetch-dest**: document
+* **sec-fetch-mode**: navigate
+* **sec-fetch-site**: same-origin
+* **sec-fetch-user**: ?1
+* **upgrade-insecure-requests**: 1
+* **x-forwarded-for**: 36.68.55.67, 10.84.6.48
+* **x-forwarded-proto**: https
+* **x-replit-user-bio**: 
+* **x-replit-user-id**: 
+* **x-replit-user-name**: 
+* **x-replit-user-profile-image**: 
+* **x-replit-user-roles**: 
+* **x-replit-user-teams**: 
+* **x-replit-user-url**: 
+
+## Route Context
+
+controller: App\Http\Controllers\Tenant\UserController@index
+route name: tenant.users.index
+middleware: web, auth, tenant.user, tenant.role:owner,admin
+
+## Route Parameters
+
+No route parameter data available.
+
+## Database Queries
+
+* mysql - select * from `users` where `id` = 6 limit 1 (540.41 ms)
+* mysql - select * from `tenants` where `tenants`.`id` = '99476284-0d23-4e97-8b6e-364502195c0a' limit 1 (147.57 ms)
+* mysql - select * from `tenants` where `tenants`.`id` = '99476284-0d23-4e97-8b6e-364502195c0a' limit 1 (147.37 ms)

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Tenant\VoucherTemplate;
 use App\Services\TenantDatabaseManager;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class VoucherTemplateController extends Controller
 {
@@ -13,8 +14,8 @@ class VoucherTemplateController extends Controller
     {
         if (!TenantDatabaseManager::isConnected()) {
             return view('tenant.voucher-templates.index', [
-                'templates' => collect(),
-                'dbError' => 'Database tenant belum dikonfigurasi.',
+                'templates' => new LengthAwarePaginator([], 0, 20),
+                'dbError' => 'Database tenant belum dikonfigurasi. Silakan hubungi administrator.',
             ]);
         }
 
