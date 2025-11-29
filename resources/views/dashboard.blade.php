@@ -130,7 +130,7 @@
                     <div class="flex justify-between">
                         <span class="text-sm text-gray-500 dark:text-gray-400">Sisa Hari</span>
                         <span class="text-sm font-medium {{ $subscriptionInfo['days_remaining'] < 7 ? 'text-red-600' : 'text-gray-900 dark:text-white' }}">
-                            {{ max(0, $subscriptionInfo['days_remaining']) }} hari
+                            {{ (int) max(0, $subscriptionInfo['days_remaining']) }} hari
                         </span>
                     </div>
                     @endif
