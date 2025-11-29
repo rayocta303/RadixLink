@@ -68,6 +68,8 @@ class TenantSeeder extends Seeder
         
         if ($mode === 'cpanel') {
             $dbCredentials = $this->setupTenantDatabase($data['subdomain']);
+        } else {
+            $dbCredentials = $this->getLocalDatabaseCredentials($data['subdomain']);
         }
 
         $plan = SubscriptionPlan::where('slug', $data['subscription_plan'])->first();
@@ -94,17 +96,12 @@ class TenantSeeder extends Seeder
             'max_online_users' => $planLimits['max_online_users'],
             'is_active' => true,
             'is_suspended' => false,
+            'tenancy_db_name' => $dbCredentials['tenancy_db_name'] ?? null,
+            'tenancy_db_username' => $dbCredentials['tenancy_db_username'] ?? null,
+            'tenancy_db_password' => $dbCredentials['tenancy_db_password'] ?? null,
+            'tenancy_db_host' => $dbCredentials['tenancy_db_host'] ?? null,
+            'data' => $dbCredentials,
         ]);
-        
-        if ($dbCredentials) {
-            $tenant->update([
-                'tenancy_db_name' => $dbCredentials['tenancy_db_name'],
-                'tenancy_db_username' => $dbCredentials['tenancy_db_username'],
-                'tenancy_db_password' => $dbCredentials['tenancy_db_password'],
-                'tenancy_db_host' => $dbCredentials['tenancy_db_host'],
-                'data' => $dbCredentials,
-            ]);
-        }
 
         $ownerUser = User::create([
             'tenant_id' => $tenant->id,
@@ -462,5 +459,24 @@ class TenantSeeder extends Seeder
             'starter' => ['max_routers' => 2, 'max_users' => 100, 'max_vouchers' => 500, 'max_online_users' => 25],
             default => ['max_routers' => 1, 'max_users' => 25, 'max_vouchers' => 50, 'max_online_users' => 5],
         };
+    }
+
+    protected function getLocalDatabaseCredentials(string $subdomain): array
+    {
+        $cpanelUsername = config('tenancy.cpanel.username');
+        $dbName = 't_' . substr(preg_replace('/[^a-z0-9]/', '', strtolower($subdomain)), 0, 10);
+        $fullDbName = $cpanelUsername . '_' . $dbName;
+        
+        $credentials = [
+            'tenancy_db_name' => $fullDbName,
+            'tenancy_db_username' => config('database.connections.mysql.username'),
+            'tenancy_db_password' => config('database.connections.mysql.password'),
+            'tenancy_db_host' => config('database.connections.mysql.host'),
+        ];
+
+        $this->runTenantMigrations($credentials);
+        $this->seedTenantData($credentials, $subdomain);
+
+        return $credentials;
     }
 }
