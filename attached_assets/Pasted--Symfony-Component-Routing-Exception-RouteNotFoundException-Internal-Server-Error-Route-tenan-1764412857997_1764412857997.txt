@@ -1,0 +1,127 @@
+# Symfony\Component\Routing\Exception\RouteNotFoundException - Internal Server Error
+
+Route [tenant.hotspot.store-profile] not defined.
+
+PHP 8.4.10
+Laravel 12.40.2
+4c51ad57-1069-43e1-bada-ee6c56e14304-00-2db5trfxf0ce5.pike.replit.dev
+
+## Stack Trace
+
+0 - vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:526
+1 - vendor/laravel/framework/src/Illuminate/Foundation/helpers.php:871
+2 - resources/views/tenant/hotspot/create-profile.blade.php:8
+3 - vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php:123
+4 - vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php:124
+5 - vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php:57
+6 - vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php:76
+7 - vendor/laravel/framework/src/Illuminate/View/View.php:208
+8 - vendor/laravel/framework/src/Illuminate/View/View.php:191
+9 - vendor/laravel/framework/src/Illuminate/View/View.php:160
+10 - vendor/laravel/framework/src/Illuminate/Http/Response.php:78
+11 - vendor/laravel/framework/src/Illuminate/Http/Response.php:34
+12 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:939
+13 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:906
+14 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:821
+15 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+16 - app/Http/Middleware/CheckTenantRole.php:58
+17 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+18 - app/Http/Middleware/TenantUserMiddleware.php:43
+19 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+20 - vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php:50
+21 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+22 - vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php:63
+23 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+24 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/VerifyCsrfToken.php:87
+25 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+26 - vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php:48
+27 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+28 - vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php:120
+29 - vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php:63
+30 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+31 - vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php:36
+32 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+33 - vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php:74
+34 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+35 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+36 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:821
+37 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:800
+38 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:764
+39 - vendor/laravel/framework/src/Illuminate/Routing/Router.php:753
+40 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:200
+41 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+42 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php:21
+43 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php:31
+44 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+45 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php:21
+46 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php:51
+47 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+48 - vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php:27
+49 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+50 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php:109
+51 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+52 - vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php:48
+53 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+54 - vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php:58
+55 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+56 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php:22
+57 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+58 - vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php:26
+59 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219
+60 - vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+61 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:175
+62 - vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:144
+63 - vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1220
+64 - public/index.php:20
+65 - vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php:23
+
+## Request
+
+GET /tenant/hotspot/profiles/create
+
+## Headers
+
+* **host**: 4c51ad57-1069-43e1-bada-ee6c56e14304-00-2db5trfxf0ce5.pike.replit.dev
+* **user-agent**: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+* **accept**: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+* **accept-encoding**: gzip, deflate, br, zstd
+* **accept-language**: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7
+* **cookie**: XSRF-TOKEN=eyJpdiI6Ik9MM3B1YW56OHZycUhFZkFoR25EZnc9PSIsInZhbHVlIjoicmFkMHVBelcyVjZReVBpOFBCZFRWRkJXU0hUSXpQNnpxWkdyYTFLejJUM3ZjTzR0ODEyUUtmc2J6TmMwVTFwQVd0U1hRNWFyZmdVUFVtTmZRd3hyY3JCUVBuaHJVVjV4YjkwTkJpNFVJUDNmVkRKKyt0aVhnR3A3WnMxY1dKK0wiLCJtYWMiOiJhNmFmN2MxMTI0ZDM2MDM3MGQyMGViMzI4ZjBiMzkzZjZlMGEwNWFiMmVkMzA2N2NlYTk5NzIyODk3ZDE3MmQxIiwidGFnIjoiIn0%3D; isp-manager-saas-session=eyJpdiI6IlpmbHdGSlY0b0xTaysyZjBPZjBlYmc9PSIsInZhbHVlIjoiYyt6MEM2SW9vWmRGUllGNzVpOUcxeDVPMS83SzZkckZmT3BVaERnRlBCRE05bGhtd0lKdFZIdnB6bi9nY2VHUkY3dlJFcVROY0kwT2RuWC9nSUphZXpxbzM1R1dtRGhRWU56MnJ1c29IYWRpMWs3Ly9FL3hkNjVRd2xFWDBRVUwiLCJtYWMiOiI5Y2UzZTE4MWZjZDMzYWUzNTQ2OGUyZjZiZGU2OTk0OTU1Njk2M2I5MGJiYmMwNzNiM2ZiOGViYjZhNzU1ZjU3IiwidGFnIjoiIn0%3D
+* **referer**: https://4c51ad57-1069-43e1-bada-ee6c56e14304-00-2db5trfxf0ce5.pike.replit.dev/tenant/hotspot
+* **sec-ch-ua**: "Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"
+* **sec-ch-ua-mobile**: ?0
+* **sec-ch-ua-platform**: "Windows"
+* **sec-fetch-dest**: document
+* **sec-fetch-mode**: navigate
+* **sec-fetch-site**: same-origin
+* **sec-fetch-user**: ?1
+* **upgrade-insecure-requests**: 1
+* **x-forwarded-for**: 36.68.55.67, 10.84.6.190
+* **x-forwarded-proto**: https
+* **x-replit-user-bio**: 
+* **x-replit-user-id**: 
+* **x-replit-user-name**: 
+* **x-replit-user-profile-image**: 
+* **x-replit-user-roles**: 
+* **x-replit-user-teams**: 
+* **x-replit-user-url**: 
+
+## Route Context
+
+controller: App\Http\Controllers\Tenant\HotspotController@createProfile
+route name: tenant.hotspot.profiles.create
+middleware: web, auth, tenant.user, tenant.role:owner,admin,technician
+
+## Route Parameters
+
+No route parameter data available.
+
+## Database Queries
+
+* mysql - select * from `users` where `id` = 6 limit 1 (537.68 ms)
+* mysql - select * from `tenants` where `tenants`.`id` = '3f2340cb-f81d-4f1f-a572-45834e4796ae' limit 1 (153.71 ms)
+* mysql - select * from `tenants` where `tenants`.`id` = '3f2340cb-f81d-4f1f-a572-45834e4796ae' limit 1 (153.82 ms)
+* tenant - select `role_id` from `model_has_roles` where `model_type` = 'App\Models\Tenant\TenantUser' and `model_id` = 6 (147 ms)
+* tenant - select * from `nas` where `is_active` = 1 order by `name` asc (147.06 ms)
+* tenant - select * from `ip_pools` where `is_active` = 1 and `type` in ('hotspot', 'both') order by `name` asc (147.08 ms)
+* tenant - select * from `bandwidth_profiles` where `is_active` = 1 order by `name` asc (146.84 ms)

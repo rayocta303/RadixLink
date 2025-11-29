@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="max-w-4xl">
-    <form action="{{ route('tenant.pppoe.store-server') }}" method="POST" class="space-y-6">
+    <form action="{{ route('tenant.pppoe.servers.store') }}" method="POST" class="space-y-6">
         @csrf
         
         <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
