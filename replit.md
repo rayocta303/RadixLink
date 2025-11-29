@@ -146,3 +146,43 @@ All tenant migrations verified and complete:
 - `support` - Light technical help: reset customer accounts
 - `reseller` - Sub-tenant: manage own clients, top-up balance
 - `investor` - View-only: access financial reports
+
+## Recent Changes (November 29, 2025 - Session 2)
+
+### TenantSeeder Migration Fix
+- Fixed `runTenantMigrations()` method in TenantSeeder.php:
+  - Using consistent connection name 'tenant_migration' instead of random suffix
+  - Setting `strict: false` in database config to avoid strict mode issues
+  - Added `Schema::connection($connectionName)->disableForeignKeyConstraints()` before migrations
+  - Enabling foreign key constraints after migration completes
+  - Better error handling with detailed logging
+  - Confirming database connection before running migrations
+- All 35 tenant tables now created successfully:
+  - nas, service_plans
+  - radcheck, radreply, radgroupcheck, radgroupreply, radusergroup, radacct, radpostauth
+  - customers, vouchers, voucher_templates, voucher_batches
+  - invoices, payments, transactions, resellers, reseller_transactions
+  - users, password_reset_tokens, roles, permissions, model_has_roles, model_has_permissions, role_has_permissions
+  - tenant_settings, tickets, ticket_replies
+  - ip_pools, bandwidth_profiles, pppoe_profiles, hotspot_profiles, hotspot_servers, pppoe_servers, customer_sessions
+  - activity_logs
+
+### Documentation Update
+- Created comprehensive README.md with:
+  - Project overview and features
+  - System architecture with Mermaid diagrams
+  - Database structure with ERD diagrams
+  - 8 detailed flowcharts:
+    1. Tenant Provisioning Flow
+    2. Customer Registration Flow
+    3. Voucher Generation Flow
+    4. Voucher Activation Flow
+    5. RADIUS Authentication Flow (Sequence Diagram)
+    6. Invoice & Payment Flow
+    7. Router Script Generation Flow
+    8. Report Generation Flow
+  - Role & Permission matrix
+  - Installation guide
+  - Configuration guide
+  - API reference
+  - Technology stack
