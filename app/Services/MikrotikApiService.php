@@ -733,20 +733,517 @@ class MikrotikApiService
 
     protected function calculateUptime(int $validity, string $unit): string
     {
-        switch ($unit) {
-            case 'minutes':
-                return $validity . 'm';
-            case 'hours':
-                return $validity . 'h';
-            case 'days':
-                return $validity . 'd';
-            case 'weeks':
-                return ($validity * 7) . 'd';
-            case 'months':
-                return ($validity * 30) . 'd';
-            default:
-                return $validity . 's';
+        return match (strtolower($unit)) {
+            'minutes', 'mins' => $validity . 'm',
+            'hours', 'hrs' => $validity . 'h',
+            'days' => $validity . 'd',
+            'weeks' => ($validity * 7) . 'd',
+            'months' => ($validity * 30) . 'd',
+            default => $validity . 's',
+        };
+    }
+
+    public function isUserLoggedIn(string $username): bool
+    {
+        if (!$this->connect()) {
+            return false;
         }
+
+        $response = $this->sendCommand([
+            '/ip/hotspot/active/print',
+            '?user=' . $username,
+        ]);
+
+        $active = $this->parseMultipleResponse($response);
+
+        if (!empty($active)) {
+            return true;
+        }
+
+        $pppResponse = $this->sendCommand([
+            '/ppp/active/print',
+            '?name=' . $username,
+        ]);
+
+        $pppActive = $this->parseMultipleResponse($pppResponse);
+
+        return !empty($pppActive);
+    }
+
+    public function loginHotspotUser(string $username, string $password, string $ip, string $mac): bool
+    {
+        if (!$this->connect()) {
+            return false;
+        }
+
+        $command = [
+            '/ip/hotspot/active/login',
+            '=user=' . $username,
+            '=password=' . $password,
+            '=ip=' . $ip,
+            '=mac-address=' . $mac,
+        ];
+
+        $response = $this->sendCommand($command);
+
+        return isset($response[0]) && $response[0] === '!done';
+    }
+
+    public function setHotspotUserProfile(string $username, string $profileName): bool
+    {
+        if (!$this->connect()) {
+            return false;
+        }
+
+        $findResponse = $this->sendCommand([
+            '/ip/hotspot/user/print',
+            '.proplist=.id',
+            '?name=' . $username,
+        ]);
+
+        $users = $this->parseMultipleResponse($findResponse);
+
+        if (empty($users)) {
+            return false;
+        }
+
+        $userId = $users[0]['.id'] ?? null;
+
+        if (!$userId) {
+            return false;
+        }
+
+        $command = [
+            '/ip/hotspot/user/set',
+            '=.id=' . $userId,
+            '=profile=' . $profileName,
+        ];
+
+        $response = $this->sendCommand($command);
+
+        return isset($response[0]) && $response[0] === '!done';
+    }
+
+    public function setHotspotUserPassword(string $username, string $password): bool
+    {
+        if (!$this->connect()) {
+            return false;
+        }
+
+        $findResponse = $this->sendCommand([
+            '/ip/hotspot/user/print',
+            '.proplist=.id',
+            '?name=' . $username,
+        ]);
+
+        $users = $this->parseMultipleResponse($findResponse);
+
+        if (empty($users)) {
+            return false;
+        }
+
+        $userId = $users[0]['.id'] ?? null;
+
+        if (!$userId) {
+            return false;
+        }
+
+        $command = [
+            '/ip/hotspot/user/set',
+            '=.id=' . $userId,
+            '=password=' . $password,
+        ];
+
+        $response = $this->sendCommand($command);
+
+        return isset($response[0]) && $response[0] === '!done';
+    }
+
+    public function setPppoeUserProfile(string $username, string $profileName): bool
+    {
+        if (!$this->connect()) {
+            return false;
+        }
+
+        $findResponse = $this->sendCommand([
+            '/ppp/secret/print',
+            '.proplist=.id',
+            '?name=' . $username,
+        ]);
+
+        $secrets = $this->parseMultipleResponse($findResponse);
+
+        if (empty($secrets)) {
+            return false;
+        }
+
+        $secretId = $secrets[0]['.id'] ?? null;
+
+        if (!$secretId) {
+            return false;
+        }
+
+        $command = [
+            '/ppp/secret/set',
+            '=.id=' . $secretId,
+            '=profile=' . $profileName,
+        ];
+
+        $response = $this->sendCommand($command);
+
+        return isset($response[0]) && $response[0] === '!done';
+    }
+
+    public function setPppoeUserPassword(string $username, string $password): bool
+    {
+        if (!$this->connect()) {
+            return false;
+        }
+
+        $findResponse = $this->sendCommand([
+            '/ppp/secret/print',
+            '.proplist=.id',
+            '?name=' . $username,
+        ]);
+
+        $secrets = $this->parseMultipleResponse($findResponse);
+
+        if (empty($secrets)) {
+            return false;
+        }
+
+        $secretId = $secrets[0]['.id'] ?? null;
+
+        if (!$secretId) {
+            return false;
+        }
+
+        $command = [
+            '/ppp/secret/set',
+            '=.id=' . $secretId,
+            '=password=' . $password,
+        ];
+
+        $response = $this->sendCommand($command);
+
+        return isset($response[0]) && $response[0] === '!done';
+    }
+
+    public function setOrAddHotspotProfile(string $profileName, int $sharedUsers, string $rateLimit): bool
+    {
+        if (!$this->connect()) {
+            return false;
+        }
+
+        $findResponse = $this->sendCommand([
+            '/ip/hotspot/user/profile/print',
+            '.proplist=.id',
+            '?name=' . $profileName,
+        ]);
+
+        $profiles = $this->parseMultipleResponse($findResponse);
+
+        if (empty($profiles)) {
+            $command = [
+                '/ip/hotspot/user/profile/add',
+                '=name=' . $profileName,
+                '=shared-users=' . $sharedUsers,
+                '=rate-limit=' . $rateLimit,
+            ];
+        } else {
+            $profileId = $profiles[0]['.id'] ?? null;
+            if (!$profileId) {
+                Log::warning('MikrotikApiService: Profile found but no .id', ['profile' => $profileName]);
+                $command = [
+                    '/ip/hotspot/user/profile/add',
+                    '=name=' . $profileName,
+                    '=shared-users=' . $sharedUsers,
+                    '=rate-limit=' . $rateLimit,
+                ];
+            } else {
+                $command = [
+                    '/ip/hotspot/user/profile/set',
+                    '=numbers=' . $profileId,
+                    '=shared-users=' . $sharedUsers,
+                    '=rate-limit=' . $rateLimit,
+                ];
+            }
+        }
+
+        $response = $this->sendCommand($command);
+
+        if (isset($response[0]) && $response[0] === '!trap') {
+            Log::warning('MikrotikApiService: Failed to set/add hotspot profile', [
+                'profile' => $profileName,
+                'response' => $response,
+            ]);
+            return false;
+        }
+
+        return isset($response[0]) && $response[0] === '!done';
+    }
+
+    public function setOrAddPppProfile(string $profileName, string $localAddress, string $remoteAddress, string $rateLimit): bool
+    {
+        if (!$this->connect()) {
+            return false;
+        }
+
+        $findResponse = $this->sendCommand([
+            '/ppp/profile/print',
+            '.proplist=.id',
+            '?name=' . $profileName,
+        ]);
+
+        $profiles = $this->parseMultipleResponse($findResponse);
+
+        if (empty($profiles)) {
+            $command = [
+                '/ppp/profile/add',
+                '=name=' . $profileName,
+                '=local-address=' . $localAddress,
+                '=remote-address=' . $remoteAddress,
+                '=rate-limit=' . $rateLimit,
+            ];
+        } else {
+            $profileId = $profiles[0]['.id'] ?? null;
+            if (!$profileId) {
+                Log::warning('MikrotikApiService: PPP Profile found but no .id', ['profile' => $profileName]);
+                $command = [
+                    '/ppp/profile/add',
+                    '=name=' . $profileName,
+                    '=local-address=' . $localAddress,
+                    '=remote-address=' . $remoteAddress,
+                    '=rate-limit=' . $rateLimit,
+                ];
+            } else {
+                $command = [
+                    '/ppp/profile/set',
+                    '=numbers=' . $profileId,
+                    '=local-address=' . $localAddress,
+                    '=remote-address=' . $remoteAddress,
+                    '=rate-limit=' . $rateLimit,
+                ];
+            }
+        }
+
+        $response = $this->sendCommand($command);
+
+        if (isset($response[0]) && $response[0] === '!trap') {
+            Log::warning('MikrotikApiService: Failed to set/add PPP profile', [
+                'profile' => $profileName,
+                'response' => $response,
+            ]);
+            return false;
+        }
+
+        return isset($response[0]) && $response[0] === '!done';
+    }
+
+    public function addHotspotUserWithLimits(
+        string $username,
+        string $password,
+        string $profileName,
+        ?string $comment = null,
+        ?string $limitUptime = null,
+        int|string|null $limitBytesTotal = null,
+        ?string $email = null
+    ): bool {
+        if (!$this->connect()) {
+            return false;
+        }
+
+        $command = [
+            '/ip/hotspot/user/add',
+            '=name=' . $username,
+            '=password=' . $password,
+            '=profile=' . $profileName,
+        ];
+
+        if ($comment) {
+            $command[] = '=comment=' . $comment;
+        }
+
+        if ($email) {
+            $command[] = '=email=' . $email;
+        }
+
+        if ($limitUptime) {
+            $command[] = '=limit-uptime=' . $limitUptime;
+        }
+
+        if ($limitBytesTotal !== null) {
+            $bytesValue = is_numeric($limitBytesTotal) ? (int) $limitBytesTotal : $this->parseBytesString($limitBytesTotal);
+            $command[] = '=limit-bytes-total=' . $bytesValue;
+        }
+
+        $response = $this->sendCommand($command);
+
+        if (isset($response[0]) && $response[0] === '!trap') {
+            Log::warning('MikrotikApiService: Failed to add hotspot user', [
+                'username' => $username,
+                'response' => $response,
+            ]);
+            return false;
+        }
+
+        return isset($response[0]) && $response[0] === '!done';
+    }
+
+    protected function parseBytesString(string $value): int
+    {
+        $value = strtoupper(trim($value));
+        $numeric = (float) preg_replace('/[^0-9.]/', '', $value);
+
+        if (str_contains($value, 'G')) {
+            return (int) ($numeric * 1073741824);
+        } elseif (str_contains($value, 'M')) {
+            return (int) ($numeric * 1048576);
+        } elseif (str_contains($value, 'K')) {
+            return (int) ($numeric * 1024);
+        }
+
+        return (int) $numeric;
+    }
+
+    public function addPppSecretWithProfile(
+        string $username,
+        string $password,
+        string $profileName,
+        ?string $comment = null,
+        ?string $remoteAddress = null
+    ): bool {
+        if (!$this->connect()) {
+            return false;
+        }
+
+        $command = [
+            '/ppp/secret/add',
+            '=name=' . $username,
+            '=password=' . $password,
+            '=service=pppoe',
+            '=profile=' . $profileName,
+        ];
+
+        if ($comment) {
+            $command[] = '=comment=' . $comment;
+        }
+
+        if ($remoteAddress) {
+            $command[] = '=remote-address=' . $remoteAddress;
+        }
+
+        $response = $this->sendCommand($command);
+
+        return isset($response[0]) && $response[0] === '!done';
+    }
+
+    public function enableRadiusForHotspot(string $radiusServer, string $radiusSecret, int $authPort = 1812, int $acctPort = 1813): bool
+    {
+        if (!$this->connect()) {
+            return false;
+        }
+
+        $this->sendCommand([
+            '/radius/add',
+            '=address=' . $radiusServer,
+            '=secret=' . $radiusSecret,
+            '=service=hotspot,ppp,login',
+            '=authentication-port=' . $authPort,
+            '=accounting-port=' . $acctPort,
+        ]);
+
+        $response = $this->sendCommand([
+            '/radius/incoming/set',
+            '=accept=yes',
+            '=port=3799',
+        ]);
+
+        return true;
+    }
+
+    public function getHotspotActiveUser(string $username): ?array
+    {
+        if (!$this->connect()) {
+            return null;
+        }
+
+        $response = $this->sendCommand([
+            '/ip/hotspot/active/print',
+            '?user=' . $username,
+        ]);
+
+        $active = $this->parseMultipleResponse($response);
+
+        return $active[0] ?? null;
+    }
+
+    public function getPppActiveUser(string $username): ?array
+    {
+        if (!$this->connect()) {
+            return null;
+        }
+
+        $response = $this->sendCommand([
+            '/ppp/active/print',
+            '?name=' . $username,
+        ]);
+
+        $active = $this->parseMultipleResponse($response);
+
+        return $active[0] ?? null;
+    }
+
+    public function getHotspotUserStats(string $username): ?array
+    {
+        if (!$this->connect()) {
+            return null;
+        }
+
+        $response = $this->sendCommand([
+            '/ip/hotspot/user/print',
+            '?name=' . $username,
+        ]);
+
+        $users = $this->parseMultipleResponse($response);
+
+        return $users[0] ?? null;
+    }
+
+    public function formatBytesForMikrotik(int $bytes): string
+    {
+        if ($bytes >= 1073741824) {
+            return round($bytes / 1073741824) . 'G';
+        } elseif ($bytes >= 1048576) {
+            return round($bytes / 1048576) . 'M';
+        } elseif ($bytes >= 1024) {
+            return round($bytes / 1024) . 'K';
+        }
+        return (string) $bytes;
+    }
+
+    public function formatTimeForMikrotik(int $seconds): string
+    {
+        if ($seconds >= 86400) {
+            $days = floor($seconds / 86400);
+            $remainder = $seconds % 86400;
+            $hours = floor($remainder / 3600);
+            if ($hours > 0) {
+                return "{$days}d{$hours}h";
+            }
+            return "{$days}d";
+        } elseif ($seconds >= 3600) {
+            $hours = floor($seconds / 3600);
+            $minutes = floor(($seconds % 3600) / 60);
+            if ($minutes > 0) {
+                return "{$hours}h{$minutes}m";
+            }
+            return "{$hours}h";
+        } elseif ($seconds >= 60) {
+            $minutes = floor($seconds / 60);
+            return "{$minutes}m";
+        }
+        return "{$seconds}s";
     }
 
     public function syncAllCustomers(): array

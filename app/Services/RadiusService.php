@@ -31,11 +31,18 @@ class RadiusService
 
             $plan = $customer->servicePlan;
             $username = $customer->username;
+            $pppoeUsername = $customer->pppoe_username ?? $username;
             $password = $customer->pppoe_password ?? $customer->password ?? 'password123';
 
             Radcheck::where('username', $username)->delete();
             Radreply::where('username', $username)->delete();
             Radusergroup::where('username', $username)->delete();
+
+            if ($pppoeUsername !== $username) {
+                Radcheck::where('username', $pppoeUsername)->delete();
+                Radreply::where('username', $pppoeUsername)->delete();
+                Radusergroup::where('username', $pppoeUsername)->delete();
+            }
 
             Radcheck::create([
                 'username' => $username,
@@ -43,6 +50,15 @@ class RadiusService
                 'op' => ':=',
                 'value' => $password,
             ]);
+
+            if ($pppoeUsername !== $username) {
+                Radcheck::create([
+                    'username' => $pppoeUsername,
+                    'attribute' => 'Cleartext-Password',
+                    'op' => ':=',
+                    'value' => $password,
+                ]);
+            }
 
             if ($customer->expires_at) {
                 $expiration = Carbon::parse($customer->expires_at)->format('d M Y H:i:s');
@@ -52,6 +68,15 @@ class RadiusService
                     'op' => ':=',
                     'value' => $expiration,
                 ]);
+
+                if ($pppoeUsername !== $username) {
+                    Radcheck::create([
+                        'username' => $pppoeUsername,
+                        'attribute' => 'Expiration',
+                        'op' => ':=',
+                        'value' => $expiration,
+                    ]);
+                }
             }
 
             if ($plan->simultaneous_use && $plan->simultaneous_use > 0) {
@@ -70,70 +95,100 @@ class RadiusService
                     'op' => ':=',
                     'value' => 'Reject',
                 ]);
+
+                if ($pppoeUsername !== $username) {
+                    Radcheck::create([
+                        'username' => $pppoeUsername,
+                        'attribute' => 'Auth-Type',
+                        'op' => ':=',
+                        'value' => 'Reject',
+                    ]);
+                }
             }
 
-            if ($plan->bandwidth_down || $plan->bandwidth_up) {
-                $rateLimit = ($plan->bandwidth_up ?? '5M') . '/' . ($plan->bandwidth_down ?? '10M');
-                
-                Radreply::create([
-                    'username' => $username,
-                    'attribute' => 'Mikrotik-Rate-Limit',
-                    'op' => ':=',
-                    'value' => $rateLimit,
-                ]);
+            $rateLimit = $plan->getMikrotikRateLimit() ?? (($plan->bandwidth_up ?? '5M') . '/' . ($plan->bandwidth_down ?? '10M'));
+            $usernamesToSync = array_unique(array_filter([$username, $pppoeUsername]));
+
+            foreach ($usernamesToSync as $syncUsername) {
+                Radreply::where('username', $syncUsername)->delete();
             }
 
-            if ($customer->static_ip) {
-                Radreply::create([
-                    'username' => $username,
-                    'attribute' => 'Framed-IP-Address',
-                    'op' => ':=',
-                    'value' => $customer->static_ip,
-                ]);
+            foreach ($usernamesToSync as $syncUsername) {
+                if ($rateLimit) {
+                    Radreply::updateOrCreate(
+                        ['username' => $syncUsername, 'attribute' => 'Mikrotik-Rate-Limit'],
+                        ['op' => ':=', 'value' => $rateLimit]
+                    );
+                }
+
+                if ($customer->static_ip) {
+                    Radreply::updateOrCreate(
+                        ['username' => $syncUsername, 'attribute' => 'Framed-IP-Address'],
+                        ['op' => ':=', 'value' => $customer->static_ip]
+                    );
+                }
+
+                if ($customer->nas && $customer->nas->nasname) {
+                    Radreply::updateOrCreate(
+                        ['username' => $syncUsername, 'attribute' => 'NAS-IP-Address'],
+                        ['op' => ':=', 'value' => $customer->nas->nasname]
+                    );
+                }
             }
 
-            if ($customer->nas && $customer->nas->nasname) {
-                Radreply::create([
-                    'username' => $username,
-                    'attribute' => 'NAS-IP-Address',
-                    'op' => ':=',
-                    'value' => $customer->nas->nasname,
-                ]);
-            }
-
-            if ($customer->pppoeProfile && $customer->pppoeProfile->address_list) {
-                Radreply::create([
-                    'username' => $username,
-                    'attribute' => 'Mikrotik-Address-List',
-                    'op' => '+=',
-                    'value' => $customer->pppoeProfile->address_list,
-                ]);
-            }
-
-            if ($plan->session_timeout && $plan->session_timeout > 0) {
-                Radreply::create([
-                    'username' => $username,
-                    'attribute' => 'Session-Timeout',
-                    'op' => ':=',
-                    'value' => (string) $plan->session_timeout,
-                ]);
-            }
-
-            if ($plan->idle_timeout && $plan->idle_timeout > 0) {
-                Radreply::create([
-                    'username' => $username,
-                    'attribute' => 'Idle-Timeout',
-                    'op' => ':=',
-                    'value' => (string) $plan->idle_timeout,
-                ]);
-            }
-
+            $profile = $customer->pppoeProfile ?? ($plan->pppoeProfile ?? null);
             $groupName = 'plan-' . $plan->id;
-            Radusergroup::create([
-                'username' => $username,
-                'groupname' => $groupName,
-                'priority' => 1,
-            ]);
+
+            foreach ($usernamesToSync as $syncUsername) {
+                if ($profile) {
+                    if ($profile->address_list) {
+                        Radreply::updateOrCreate(
+                            ['username' => $syncUsername, 'attribute' => 'Mikrotik-Address-List'],
+                            ['op' => '+=', 'value' => $profile->address_list]
+                        );
+                    }
+
+                    if ($profile->idle_timeout) {
+                        Radreply::updateOrCreate(
+                            ['username' => $syncUsername, 'attribute' => 'Idle-Timeout'],
+                            ['op' => ':=', 'value' => (string) $profile->idle_timeout]
+                        );
+                    }
+                }
+
+                $sessionTimeout = null;
+                if ($plan->session_timeout && $plan->session_timeout > 0) {
+                    $sessionTimeout = (string) $plan->session_timeout;
+                } elseif ($plan->validity && $plan->validity_unit) {
+                    $sessionTimeout = (string) $this->calculateSessionTimeout($plan->validity, $plan->validity_unit);
+                }
+                
+                if ($sessionTimeout) {
+                    Radreply::updateOrCreate(
+                        ['username' => $syncUsername, 'attribute' => 'Session-Timeout'],
+                        ['op' => ':=', 'value' => $sessionTimeout]
+                    );
+                }
+
+                if ($plan->idle_timeout && $plan->idle_timeout > 0) {
+                    Radreply::updateOrCreate(
+                        ['username' => $syncUsername, 'attribute' => 'Idle-Timeout'],
+                        ['op' => ':=', 'value' => (string) $plan->idle_timeout]
+                    );
+                }
+
+                if ($plan->ipPool && $plan->ipPool->pool_name) {
+                    Radreply::updateOrCreate(
+                        ['username' => $syncUsername, 'attribute' => 'Framed-Pool'],
+                        ['op' => ':=', 'value' => $plan->ipPool->pool_name]
+                    );
+                }
+
+                Radusergroup::updateOrCreate(
+                    ['username' => $syncUsername],
+                    ['groupname' => $groupName, 'priority' => 1]
+                );
+            }
 
             $this->syncServicePlan($plan);
 

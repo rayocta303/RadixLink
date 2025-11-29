@@ -16,6 +16,9 @@ class Customer extends Authenticatable
         'address',
         'coordinates',
         'service_plan_id',
+        'nas_id',
+        'pppoe_profile_id',
+        'hotspot_profile_id',
         'service_type',
         'status',
         'registered_at',
@@ -26,6 +29,7 @@ class Customer extends Authenticatable
         'balance',
         'auto_renew',
         'pppoe_password',
+        'pppoe_username',
         'static_ip',
         'meta',
         'created_by',
@@ -49,6 +53,21 @@ class Customer extends Authenticatable
     public function servicePlan()
     {
         return $this->belongsTo(ServicePlan::class);
+    }
+
+    public function nas()
+    {
+        return $this->belongsTo(Nas::class);
+    }
+
+    public function pppoeProfile()
+    {
+        return $this->belongsTo(PppoeProfile::class);
+    }
+
+    public function hotspotProfile()
+    {
+        return $this->belongsTo(HotspotProfile::class);
     }
 
     public function vouchers()
