@@ -271,113 +271,156 @@
                     Mulai gratis 14 hari, upgrade kapan saja sesuai kebutuhan
                 </p>
             </div>
-            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                @forelse($plans as $plan)
-                <div class="bg-white border {{ $plan->slug === 'cloud-special' ? 'border-primary-600 border-2' : 'border-gray-200' }} rounded-xl p-8 relative">
-                    @if($plan->slug === 'cloud-special')
-                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                        Paling Populer
-                    </div>
-                    @endif
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ $plan->name }}</h3>
-                    <div class="mb-6">
-                        <span class="text-4xl font-bold text-gray-900">Rp {{ number_format($plan->price_monthly, 0, ',', '.') }}</span>
-                        <span class="text-gray-600">/bulan</span>
-                    </div>
-                    @if($plan->description)
-                    <p class="text-sm text-gray-500 mb-4">{{ $plan->description }}</p>
-                    @endif
-                    <ul class="space-y-3 mb-8">
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="text-sm text-gray-600">Maks. <strong>{{ $plan->max_routers >= 999 ? 'Unlimited' : $plan->max_routers }}</strong> Router</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="text-sm text-gray-600">Maks. <strong>{{ $plan->max_users >= 999999 ? 'Unlimited' : number_format($plan->max_users) }}</strong> User</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="text-sm text-gray-600">Maks. <strong>{{ $plan->max_vouchers >= 999999 ? 'Unlimited' : number_format($plan->max_vouchers) }}</strong> Voucher</span>
-                        </li>
-                        @if($plan->custom_domain)
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="text-sm text-gray-600">Custom Domain</span>
-                        </li>
-                        @endif
-                        @if($plan->api_access)
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="text-sm text-gray-600">API Access</span>
-                        </li>
-                        @endif
-                        @if($plan->priority_support)
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="text-sm text-gray-600">Priority Support</span>
-                        </li>
-                        @endif
-                        @if($plan->features)
-                            @php 
-                                $rawFeatures = $plan->features;
-                                $featureList = [];
-                                
-                                if (is_string($rawFeatures)) {
-                                    $decoded = json_decode($rawFeatures, true);
-                                    if (is_array($decoded)) {
-                                        if (array_is_list($decoded)) {
-                                            $featureList = $decoded;
-                                        } else {
-                                            $featureList = array_map(
-                                                fn($key) => ucwords(str_replace('_', ' ', $key)),
-                                                array_keys(array_filter($decoded, fn($v) => $v === true))
-                                            );
-                                        }
-                                    }
-                                } elseif (is_array($rawFeatures)) {
-                                    if (array_is_list($rawFeatures)) {
-                                        $featureList = $rawFeatures;
-                                    } else {
-                                        $featureList = array_map(
-                                            fn($key) => ucwords(str_replace('_', ' ', $key)),
-                                            array_keys(array_filter($rawFeatures, fn($v) => $v === true))
-                                        );
-                                    }
-                                }
-                            @endphp
-                            @foreach($featureList as $featureName)
-                                <li class="flex items-start">
-                                    <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            
+            @if($plans->isNotEmpty())
+            <!-- Pricing Table -->
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden max-w-6xl mx-auto">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200">
+                                <th class="px-6 py-4 text-left">
+                                    <span class="text-sm font-semibold text-gray-900">Fitur</span>
+                                </th>
+                                @foreach($plans as $plan)
+                                <th class="px-6 py-4 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50' : '' }}">
+                                    <div class="space-y-2">
+                                        @if($plan->slug === 'cloud-special')
+                                        <span class="inline-block bg-primary-600 text-white px-3 py-1 rounded-full text-xs font-semibold mb-2">
+                                            Paling Populer
+                                        </span>
+                                        @endif
+                                        <div class="text-lg font-bold text-gray-900">{{ $plan->name }}</div>
+                                        @if($plan->description)
+                                        <div class="text-xs text-gray-500">{{ $plan->description }}</div>
+                                        @endif
+                                        <div class="mt-4">
+                                            <span class="text-3xl font-bold text-gray-900">Rp {{ number_format($plan->price_monthly, 0, ',', '.') }}</span>
+                                            <span class="text-gray-600 text-sm">/bulan</span>
+                                        </div>
+                                    </div>
+                                </th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <!-- Router Limit -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900">Maksimal Router</td>
+                                @foreach($plans as $plan)
+                                <td class="px-6 py-4 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
+                                    <span class="text-sm font-semibold text-gray-900">
+                                        {{ $plan->max_routers >= 999 ? 'Unlimited' : $plan->max_routers }}
+                                    </span>
+                                </td>
+                                @endforeach
+                            </tr>
+                            
+                            <!-- User Limit -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900">Maksimal User</td>
+                                @foreach($plans as $plan)
+                                <td class="px-6 py-4 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
+                                    <span class="text-sm font-semibold text-gray-900">
+                                        {{ $plan->max_users >= 999999 ? 'Unlimited' : number_format($plan->max_users) }}
+                                    </span>
+                                </td>
+                                @endforeach
+                            </tr>
+                            
+                            <!-- Voucher Limit -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900">Maksimal Voucher</td>
+                                @foreach($plans as $plan)
+                                <td class="px-6 py-4 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
+                                    <span class="text-sm font-semibold text-gray-900">
+                                        {{ $plan->max_vouchers >= 999999 ? 'Unlimited' : number_format($plan->max_vouchers) }}
+                                    </span>
+                                </td>
+                                @endforeach
+                            </tr>
+                            
+                            <!-- Custom Domain -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900">Custom Domain</td>
+                                @foreach($plans as $plan)
+                                <td class="px-6 py-4 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
+                                    @if($plan->custom_domain)
+                                    <svg class="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                     </svg>
-                                    <span class="text-sm text-gray-600">{{ $featureName }}</span>
-                                </li>
-                            @endforeach
-                        @endif
-                    </ul>
-                    <a href="{{ route('register') }}" class="block w-full text-center px-4 py-2 text-sm font-medium {{ $plan->slug === 'cloud-special' ? 'text-white bg-primary-600 hover:bg-primary-700' : 'text-primary-600 bg-white border border-primary-600 hover:bg-primary-50' }} rounded-lg transition-colors">
-                        Mulai Gratis
-                    </a>
+                                    @else
+                                    <svg class="w-5 h-5 text-gray-300 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    </svg>
+                                    @endif
+                                </td>
+                                @endforeach
+                            </tr>
+                            
+                            <!-- API Access -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900">API Access</td>
+                                @foreach($plans as $plan)
+                                <td class="px-6 py-4 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
+                                    @if($plan->api_access)
+                                    <svg class="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    @else
+                                    <svg class="w-5 h-5 text-gray-300 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    </svg>
+                                    @endif
+                                </td>
+                                @endforeach
+                            </tr>
+                            
+                            <!-- Priority Support -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900">Priority Support</td>
+                                @foreach($plans as $plan)
+                                <td class="px-6 py-4 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/30' : '' }}">
+                                    @if($plan->priority_support)
+                                    <svg class="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    @else
+                                    <svg class="w-5 h-5 text-gray-300 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    </svg>
+                                    @endif
+                                </td>
+                                @endforeach
+                            </tr>
+                            
+                            <!-- CTA Row -->
+                            <tr class="bg-gray-50">
+                                <td class="px-6 py-6"></td>
+                                @foreach($plans as $plan)
+                                <td class="px-6 py-6 text-center {{ $plan->slug === 'cloud-special' ? 'bg-primary-50/50' : '' }}">
+                                    <a href="{{ route('register') }}" class="inline-block w-full px-6 py-3 text-sm font-semibold rounded-lg transition-colors {{ $plan->slug === 'cloud-special' ? 'text-white bg-primary-600 hover:bg-primary-700' : 'text-primary-600 bg-white border-2 border-primary-600 hover:bg-primary-50' }}">
+                                        Mulai Gratis
+                                    </a>
+                                </td>
+                                @endforeach
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                @empty
-                <div class="col-span-full text-center py-12">
-                    <p class="text-gray-500">Paket langganan akan segera tersedia.</p>
-                </div>
-                @endforelse
             </div>
+            
+            <!-- Additional Info -->
+            <div class="mt-8 text-center">
+                <p class="text-sm text-gray-600">
+                    Semua paket termasuk: Multi-NAS Support, Voucher Generator, Payment Gateway, Multi-Tenant System, Role Management & Real-time Analytics
+                </p>
+            </div>
+            @else
+            <div class="text-center py-12">
+                <p class="text-gray-500">Paket langganan akan segera tersedia.</p>
+            </div>
+            @endif
         </div>
     </section>
 
