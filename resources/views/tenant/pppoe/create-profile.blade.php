@@ -72,8 +72,8 @@
                         <select name="bandwidth_id" id="bandwidth_id"
                             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                             <option value="">-- Pilih Bandwidth --</option>
-                            @foreach($bandwidthProfiles ?? [] as $bw)
-                                <option value="{{ $bw->id }}" {{ old('bandwidth_id') == $bw->id ? 'selected' : '' }}>{{ $bw->name }} ({{ $bw->rate_limit_download }})</option>
+                            @foreach($bandwidths ?? [] as $bw)
+                                <option value="{{ $bw->id }}" {{ old('bandwidth_id') == $bw->id ? 'selected' : '' }}>{{ $bw->name }} ({{ $bw->rate_down }}/{{ $bw->rate_up }})</option>
                             @endforeach
                         </select>
                         @error('bandwidth_id')
