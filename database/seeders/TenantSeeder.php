@@ -326,6 +326,9 @@ class TenantSeeder extends Seeder
             }
             DB::connection($connectionName)->table('vouchers')->insert($vouchers);
 
+            $this->seedTenantRoles($connectionName);
+            $this->seedTenantOwnerUser($connectionName, $subdomain);
+
             $this->command->info("  Seeded tenant data successfully");
         } catch (\Exception $e) {
             $this->command->error("  Seed error: " . $e->getMessage());
@@ -333,6 +336,120 @@ class TenantSeeder extends Seeder
         } finally {
             DB::purge($connectionName);
         }
+    }
+
+    protected function seedTenantRoles(string $connectionName): void
+    {
+        $now = now();
+
+        $existingRoles = DB::connection($connectionName)->table('roles')->count();
+        if ($existingRoles > 0) {
+            return;
+        }
+
+        $permissions = [
+            ['name' => 'customers.view', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'customers.create', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'customers.edit', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'customers.delete', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'customers.suspend', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'customers.reset', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'vouchers.view', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'vouchers.create', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'vouchers.generate', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'vouchers.print', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'vouchers.delete', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'invoices.view', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'invoices.create', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'invoices.edit', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'invoices.pay', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'invoices.delete', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'nas.view', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'nas.create', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'nas.edit', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'nas.delete', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'nas.debug', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'services.view', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'services.create', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'services.edit', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'services.delete', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'reports.view', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'reports.financial', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'reports.export', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'users.view', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'users.create', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'users.edit', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'users.delete', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'settings.view', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'settings.update', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'resellers.view', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'resellers.manage', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'balance.view', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'balance.topup', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'tickets.view', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'tickets.create', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'tickets.reply', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'radius.monitor', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'radius.disconnect', 'guard_name' => 'tenant', 'created_at' => $now, 'updated_at' => $now],
+        ];
+
+        DB::connection($connectionName)->table('permissions')->insert($permissions);
+
+        $roles = [
+            ['name' => 'owner', 'guard_name' => 'tenant', 'display_name' => 'Pemilik', 'description' => 'Akses penuh ke seluruh fitur tenant', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'admin', 'guard_name' => 'tenant', 'display_name' => 'Administrator', 'description' => 'Mengelola operasional: pengguna, NAS, paket, voucher', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'technician', 'guard_name' => 'tenant', 'display_name' => 'Teknisi', 'description' => 'Akses teknis jaringan: debug, monitoring, manajemen NAS', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'cashier', 'guard_name' => 'tenant', 'display_name' => 'Kasir', 'description' => 'Transaksi: cetak voucher, kelola invoice, pembayaran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'support', 'guard_name' => 'tenant', 'display_name' => 'Dukungan', 'description' => 'Bantuan teknis ringan: reset akun pelanggan', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'reseller', 'guard_name' => 'tenant', 'display_name' => 'Reseller', 'description' => 'Sub-tenant: kelola klien sendiri, topup saldo', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'investor', 'guard_name' => 'tenant', 'display_name' => 'Investor', 'description' => 'View-only: akses laporan keuangan', 'created_at' => $now, 'updated_at' => $now],
+        ];
+
+        DB::connection($connectionName)->table('roles')->insert($roles);
+
+        $permissionIds = DB::connection($connectionName)->table('permissions')->pluck('id', 'name');
+        $roleIds = DB::connection($connectionName)->table('roles')->pluck('id', 'name');
+
+        $ownerPermissions = $permissionIds->keys()->toArray();
+        $roleHasPermissions = [];
+        foreach ($ownerPermissions as $permName) {
+            $roleHasPermissions[] = [
+                'role_id' => $roleIds['owner'],
+                'permission_id' => $permissionIds[$permName],
+            ];
+        }
+
+        DB::connection($connectionName)->table('role_has_permissions')->insert($roleHasPermissions);
+        $this->command->info("  Tenant roles and permissions seeded");
+    }
+
+    protected function seedTenantOwnerUser(string $connectionName, string $subdomain): void
+    {
+        $existingUsers = DB::connection($connectionName)->table('users')->count();
+        if ($existingUsers > 0) {
+            return;
+        }
+
+        $userId = DB::connection($connectionName)->table('users')->insertGetId([
+            'name' => 'Owner ' . ucfirst($subdomain),
+            'email' => 'owner@' . $subdomain . '.id',
+            'phone' => '08' . rand(1000000000, 9999999999),
+            'password' => Hash::make('owner123'),
+            'email_verified_at' => now(),
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $ownerRoleId = DB::connection($connectionName)->table('roles')->where('name', 'owner')->value('id');
+        
+        DB::connection($connectionName)->table('model_has_roles')->insert([
+            'role_id' => $ownerRoleId,
+            'model_type' => 'App\\Models\\Tenant\\TenantUser',
+            'model_id' => $userId,
+        ]);
+
+        $this->command->info("  Tenant owner user created (owner@{$subdomain}.id / owner123)");
     }
 
     protected function getDefaultPlanLimits(string $plan): array

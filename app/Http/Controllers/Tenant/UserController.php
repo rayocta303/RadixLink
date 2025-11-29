@@ -12,9 +12,23 @@ use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
-    public function index()
+    protected function checkConnection()
     {
         if (!TenantDatabaseManager::isConnected()) {
+            return false;
+        }
+        return true;
+    }
+
+    protected function connectionErrorRedirect()
+    {
+        return redirect()->route('tenant.users.index')
+            ->with('error', 'Database tenant belum dikonfigurasi.');
+    }
+
+    public function index()
+    {
+        if (!$this->checkConnection()) {
             return view('tenant.users.index', [
                 'users' => collect(),
                 'dbError' => 'Database tenant belum dikonfigurasi. Silakan hubungi administrator.',
@@ -27,9 +41,8 @@ class UserController extends Controller
 
     public function create()
     {
-        if (!TenantDatabaseManager::isConnected()) {
-            return redirect()->route('tenant.users.index')
-                ->with('error', 'Database tenant belum dikonfigurasi.');
+        if (!$this->checkConnection()) {
+            return $this->connectionErrorRedirect();
         }
         
         $roles = TenantRole::all();
@@ -38,9 +51,8 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        if (!TenantDatabaseManager::isConnected()) {
-            return redirect()->route('tenant.users.index')
-                ->with('error', 'Database tenant belum dikonfigurasi.');
+        if (!$this->checkConnection()) {
+            return $this->connectionErrorRedirect();
         }
         
         $validated = $request->validate([
@@ -64,35 +76,34 @@ class UserController extends Controller
         return redirect()->route('tenant.users.index')->with('success', 'User berhasil ditambahkan.');
     }
 
-    public function show(TenantUser $user)
+    public function show(int $id)
     {
-        if (!TenantDatabaseManager::isConnected()) {
-            return redirect()->route('tenant.users.index')
-                ->with('error', 'Database tenant belum dikonfigurasi.');
+        if (!$this->checkConnection()) {
+            return $this->connectionErrorRedirect();
         }
         
-        $user->load('roles');
+        $user = TenantUser::with('roles')->findOrFail($id);
         return view('tenant.users.show', compact('user'));
     }
 
-    public function edit(TenantUser $user)
+    public function edit(int $id)
     {
-        if (!TenantDatabaseManager::isConnected()) {
-            return redirect()->route('tenant.users.index')
-                ->with('error', 'Database tenant belum dikonfigurasi.');
+        if (!$this->checkConnection()) {
+            return $this->connectionErrorRedirect();
         }
         
-        $user->load('roles');
+        $user = TenantUser::with('roles')->findOrFail($id);
         $roles = TenantRole::all();
         return view('tenant.users.edit', compact('user', 'roles'));
     }
 
-    public function update(Request $request, TenantUser $user)
+    public function update(Request $request, int $id)
     {
-        if (!TenantDatabaseManager::isConnected()) {
-            return redirect()->route('tenant.users.index')
-                ->with('error', 'Database tenant belum dikonfigurasi.');
+        if (!$this->checkConnection()) {
+            return $this->connectionErrorRedirect();
         }
+        
+        $user = TenantUser::findOrFail($id);
         
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -118,16 +129,16 @@ class UserController extends Controller
         return redirect()->route('tenant.users.index')->with('success', 'User berhasil diperbarui.');
     }
 
-    public function destroy(TenantUser $user)
+    public function destroy(int $id)
     {
-        if (!TenantDatabaseManager::isConnected()) {
-            return redirect()->route('tenant.users.index')
-                ->with('error', 'Database tenant belum dikonfigurasi.');
+        if (!$this->checkConnection()) {
+            return $this->connectionErrorRedirect();
         }
         
+        $user = TenantUser::findOrFail($id);
         $tenantUser = session('tenant_user');
         
-        if ($user->id === $tenantUser->id) {
+        if ($user->id === $tenantUser?->id) {
             return back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }
 

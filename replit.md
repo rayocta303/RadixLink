@@ -100,3 +100,49 @@ Available subscription plans (from SubscriptionPlanSeeder):
 - Removed incorrect `tenant_id` filtering from platform activity logs query
 - Removed trial feature (trial_ends_at) from all models, migrations, and views
 - Updated platform monitoring to show "Tenant Baru Bulan Ini" instead of "Masa Trial"
+
+## Recent Changes (November 29, 2025)
+
+### Route Name Fixes
+- Fixed PPPoE view route names (12 routes total):
+  - `tenant.pppoe.create-profile` → `tenant.pppoe.profiles.create`
+  - `tenant.pppoe.edit-profile` → `tenant.pppoe.profiles.edit`
+  - `tenant.pppoe.destroy-profile` → `tenant.pppoe.profiles.destroy`
+  - `tenant.pppoe.create-server` → `tenant.pppoe.servers.create`
+  - `tenant.pppoe.edit-server` → `tenant.pppoe.servers.edit`
+  - `tenant.pppoe.destroy-server` → `tenant.pppoe.servers.destroy`
+- Fixed Hotspot view route names (same pattern as PPPoE)
+
+### Controller Fixes
+- **VoucherTemplateController**: Fixed pagination issue - returns `LengthAwarePaginator` instead of `Collection` when tenant DB not connected
+- **UserController**: Removed route model binding to prevent "Database connection [tenant] not configured" errors
+  - Changed method signatures from `TenantUser $user` to `int $id`
+  - Added `checkConnection()` and `connectionErrorRedirect()` helper methods
+  - Connection check now runs BEFORE any database query
+
+### View Fixes
+- **tenant/users/index.blade.php**: Added dbError alert block and disabled "Tambah User" button when tenant database is not connected
+
+### TenantSeeder Improvements
+- Added `seedTenantRoles()` method - seeds 43 permissions and 7 roles (owner, admin, technician, cashier, support, reseller, investor)
+- Added `seedTenantOwnerUser()` method - creates owner user with role assignment for each new tenant
+- Tenant owner credentials: `owner@{subdomain}.id` / `owner123`
+
+### Tenant Database Schema
+All tenant migrations verified and complete:
+1. `create_tenant_nas_table` - nas, service_plans tables
+2. `create_radius_tables` - radcheck, radreply, radgroupcheck, radgroupreply, radusergroup, radacct, radpostauth
+3. `create_customers_vouchers_table` - customers, vouchers, voucher_templates, voucher_batches
+4. `create_billing_tables` - invoices, payments, transactions, resellers, reseller_transactions
+5. `create_tenant_users_table` - users, roles, permissions, model_has_roles, model_has_permissions, role_has_permissions, tenant_settings, tickets, ticket_replies
+6. `create_network_management_tables` - ip_pools, bandwidth_profiles, pppoe_profiles, hotspot_profiles, hotspot_servers, pppoe_servers, customer_sessions
+7. `create_tenant_activity_logs_table` - activity_logs
+
+### Tenant Roles (in tenant database)
+- `owner` - Full access to all tenant features
+- `admin` - Manage operations: users, NAS, plans, vouchers
+- `technician` - Technical access: debug, monitoring, NAS management
+- `cashier` - Transactions: print vouchers, manage invoices, payments
+- `support` - Light technical help: reset customer accounts
+- `reseller` - Sub-tenant: manage own clients, top-up balance
+- `investor` - View-only: access financial reports
