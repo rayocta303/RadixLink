@@ -182,6 +182,103 @@
 
         <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Router & Profile</h3>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Konfigurasi router dan profile untuk integrasi MikroTik</p>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label for="router_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Router/NAS</label>
+                        <select name="router_name" id="router_name"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                            <option value="">-- Pilih Router --</option>
+                            @foreach($routers ?? [] as $router)
+                                <option value="{{ $router->shortname ?? $router->name }}" {{ old('router_name') == ($router->shortname ?? $router->name) ? 'selected' : '' }}>
+                                    {{ $router->name }} ({{ $router->nasname }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('router_name')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="bandwidth_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bandwidth Profile</label>
+                        <select name="bandwidth_id" id="bandwidth_id"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                            <option value="">-- Pilih Bandwidth Profile --</option>
+                            @foreach($bandwidths ?? [] as $bandwidth)
+                                <option value="{{ $bandwidth->id }}" {{ old('bandwidth_id') == $bandwidth->id ? 'selected' : '' }}>
+                                    {{ $bandwidth->name }} ({{ $bandwidth->rate_down }}/{{ $bandwidth->rate_up }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('bandwidth_id')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label for="ip_pool_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">IP Pool</label>
+                        <select name="ip_pool_id" id="ip_pool_id"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                            <option value="">-- Pilih IP Pool --</option>
+                            @foreach($ipPools ?? [] as $pool)
+                                <option value="{{ $pool->id }}" {{ old('ip_pool_id') == $pool->id ? 'selected' : '' }}>
+                                    {{ $pool->name }} ({{ $pool->pool_name }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('ip_pool_id')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="pool" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pool Name (Manual)</label>
+                        <input type="text" name="pool" id="pool" value="{{ old('pool') }}"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                            placeholder="Nama pool manual (opsional)">
+                        @error('pool')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+                <div id="pppoeProfileSection" class="hidden">
+                    <label for="pppoe_profile_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">PPPoE Profile</label>
+                    <select name="pppoe_profile_id" id="pppoe_profile_id"
+                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                        <option value="">-- Pilih PPPoE Profile --</option>
+                        @foreach($pppoeProfiles ?? [] as $profile)
+                            <option value="{{ $profile->id }}" {{ old('pppoe_profile_id') == $profile->id ? 'selected' : '' }}>
+                                {{ $profile->name }} ({{ $profile->profile_name }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('pppoe_profile_id')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div id="hotspotProfileSection" class="hidden">
+                    <label for="hotspot_profile_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Hotspot Profile</label>
+                    <select name="hotspot_profile_id" id="hotspot_profile_id"
+                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                        <option value="">-- Pilih Hotspot Profile --</option>
+                        @foreach($hotspotProfiles ?? [] as $profile)
+                            <option value="{{ $profile->id }}" {{ old('hotspot_profile_id') == $profile->id ? 'selected' : '' }}>
+                                {{ $profile->name }} ({{ $profile->profile_name }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('hotspot_profile_id')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">Pengaturan Lainnya</h3>
             </div>
             <div class="p-6 space-y-4">
@@ -201,12 +298,28 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center">
-                    <input type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}
-                        class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
-                    <label for="is_active" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-                        Paket Aktif (tersedia untuk dijual)
-                    </label>
+                <div class="space-y-3">
+                    <div class="flex items-center">
+                        <input type="checkbox" name="prepaid" id="prepaid" value="1" {{ old('prepaid', true) ? 'checked' : '' }}
+                            class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                        <label for="prepaid" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                            Prepaid (bayar di muka)
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" name="enabled" id="enabled" value="1" {{ old('enabled', true) ? 'checked' : '' }}
+                            class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                        <label for="enabled" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                            Enabled (aktif di router)
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}
+                            class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                        <label for="is_active" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                            Paket Aktif (tersedia untuk dijual)
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -228,5 +341,20 @@ function toggleFupFields() {
     const fupFields = document.getElementById('fupFields');
     fupFields.classList.toggle('hidden', !hasFup);
 }
+
+function toggleProfileSections() {
+    const type = document.getElementById('type').value;
+    const pppoeSection = document.getElementById('pppoeProfileSection');
+    const hotspotSection = document.getElementById('hotspotProfileSection');
+    
+    pppoeSection.classList.toggle('hidden', type !== 'pppoe');
+    hotspotSection.classList.toggle('hidden', type !== 'hotspot');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const typeSelect = document.getElementById('type');
+    typeSelect.addEventListener('change', toggleProfileSections);
+    toggleProfileSections();
+});
 </script>
 @endsection

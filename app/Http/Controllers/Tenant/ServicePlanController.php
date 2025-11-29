@@ -3,6 +3,11 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
+use App\Models\Tenant\BandwidthProfile;
+use App\Models\Tenant\HotspotProfile;
+use App\Models\Tenant\IpPool;
+use App\Models\Tenant\Nas;
+use App\Models\Tenant\PppoeProfile;
 use App\Models\Tenant\ServicePlan;
 use App\Services\TenantDatabaseManager;
 use Illuminate\Http\Request;
@@ -30,7 +35,19 @@ class ServicePlanController extends Controller
                 ->with('error', 'Database tenant belum dikonfigurasi.');
         }
 
-        return view('tenant.services.create');
+        $routers = Nas::where('is_active', true)->orderBy('name')->get();
+        $ipPools = IpPool::where('is_active', true)->orderBy('name')->get();
+        $bandwidths = BandwidthProfile::where('is_active', true)->orderBy('name')->get();
+        $pppoeProfiles = PppoeProfile::where('is_active', true)->orderBy('name')->get();
+        $hotspotProfiles = HotspotProfile::where('is_active', true)->orderBy('name')->get();
+
+        return view('tenant.services.create', compact(
+            'routers',
+            'ipPools',
+            'bandwidths',
+            'pppoeProfiles',
+            'hotspotProfiles'
+        ));
     }
 
     public function store(Request $request)
@@ -59,6 +76,14 @@ class ServicePlanController extends Controller
             'max_devices' => 'nullable|integer|min:1|max:100',
             'simultaneous_use' => 'nullable|integer|min:1|max:100',
             'is_active' => 'boolean',
+            'router_name' => 'nullable|string|max:100',
+            'pool' => 'nullable|string|max:100',
+            'bandwidth_id' => 'nullable|exists:tenant.bandwidth_profiles,id',
+            'ip_pool_id' => 'nullable|exists:tenant.ip_pools,id',
+            'pppoe_profile_id' => 'nullable|exists:tenant.pppoe_profiles,id',
+            'hotspot_profile_id' => 'nullable|exists:tenant.hotspot_profiles,id',
+            'prepaid' => 'boolean',
+            'enabled' => 'boolean',
         ]);
 
         if (empty($validated['code'])) {
@@ -68,6 +93,8 @@ class ServicePlanController extends Controller
         $validated['is_active'] = $request->boolean('is_active', true);
         $validated['has_fup'] = $request->boolean('has_fup', false);
         $validated['can_share'] = $request->boolean('can_share', false);
+        $validated['prepaid'] = $request->boolean('prepaid', true);
+        $validated['enabled'] = $request->boolean('enabled', true);
         $validated['max_devices'] = $validated['max_devices'] ?? 1;
         $validated['simultaneous_use'] = $validated['simultaneous_use'] ?? 1;
 
@@ -100,7 +127,20 @@ class ServicePlanController extends Controller
         }
 
         $service = ServicePlan::findOrFail($id);
-        return view('tenant.services.edit', compact('service'));
+        $routers = Nas::where('is_active', true)->orderBy('name')->get();
+        $ipPools = IpPool::where('is_active', true)->orderBy('name')->get();
+        $bandwidths = BandwidthProfile::where('is_active', true)->orderBy('name')->get();
+        $pppoeProfiles = PppoeProfile::where('is_active', true)->orderBy('name')->get();
+        $hotspotProfiles = HotspotProfile::where('is_active', true)->orderBy('name')->get();
+
+        return view('tenant.services.edit', compact(
+            'service',
+            'routers',
+            'ipPools',
+            'bandwidths',
+            'pppoeProfiles',
+            'hotspotProfiles'
+        ));
     }
 
     public function update(Request $request, $id)
@@ -131,11 +171,21 @@ class ServicePlanController extends Controller
             'max_devices' => 'nullable|integer|min:1|max:100',
             'simultaneous_use' => 'nullable|integer|min:1|max:100',
             'is_active' => 'boolean',
+            'router_name' => 'nullable|string|max:100',
+            'pool' => 'nullable|string|max:100',
+            'bandwidth_id' => 'nullable|exists:tenant.bandwidth_profiles,id',
+            'ip_pool_id' => 'nullable|exists:tenant.ip_pools,id',
+            'pppoe_profile_id' => 'nullable|exists:tenant.pppoe_profiles,id',
+            'hotspot_profile_id' => 'nullable|exists:tenant.hotspot_profiles,id',
+            'prepaid' => 'boolean',
+            'enabled' => 'boolean',
         ]);
 
         $validated['is_active'] = $request->boolean('is_active');
         $validated['has_fup'] = $request->boolean('has_fup', false);
         $validated['can_share'] = $request->boolean('can_share', false);
+        $validated['prepaid'] = $request->boolean('prepaid', true);
+        $validated['enabled'] = $request->boolean('enabled', true);
 
         if ($request->filled('quota_gb') && $request->quota_gb > 0) {
             $validated['quota_bytes'] = $request->quota_gb * 1073741824;

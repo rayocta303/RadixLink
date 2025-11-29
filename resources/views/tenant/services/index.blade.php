@@ -40,6 +40,7 @@
             <thead>
                 <tr>
                     <th>Nama Paket</th>
+                    <th>Router</th>
                     <th>Bandwidth</th>
                     <th>Tipe</th>
                     <th>Harga</th>
@@ -66,24 +67,45 @@
                     </td>
                     <td>
                         <div class="text-sm">
-                            <div class="text-green-600 dark:text-green-400">
-                                <span class="font-medium">Down:</span> {{ $service->bandwidth_down ?? '-' }}
-                            </div>
-                            <div class="text-blue-600 dark:text-blue-400">
-                                <span class="font-medium">Up:</span> {{ $service->bandwidth_up ?? '-' }}
-                            </div>
+                            @if($service->router_name)
+                                <span class="text-gray-900 dark:text-white">{{ $service->router_name }}</span>
+                            @else
+                                <span class="text-gray-400 dark:text-gray-500">-</span>
+                            @endif
                         </div>
                     </td>
                     <td>
-                        @if($service->type === 'pppoe')
-                            <span class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">PPPoE</span>
-                        @elseif($service->type === 'hotspot')
-                            <span class="inline-flex items-center rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">Hotspot</span>
-                        @elseif($service->type === 'dhcp')
-                            <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">DHCP</span>
-                        @else
-                            <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-700 dark:text-gray-400">{{ ucfirst($service->type) }}</span>
-                        @endif
+                        <div class="text-sm">
+                            @if($service->bandwidth)
+                                <div class="font-medium text-gray-900 dark:text-white">{{ $service->bandwidth->name }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ $service->bandwidth->rate_down }}/{{ $service->bandwidth->rate_up }}</div>
+                            @else
+                                <div class="text-green-600 dark:text-green-400">
+                                    <span class="font-medium">Down:</span> {{ $service->bandwidth_down ?? '-' }}
+                                </div>
+                                <div class="text-blue-600 dark:text-blue-400">
+                                    <span class="font-medium">Up:</span> {{ $service->bandwidth_up ?? '-' }}
+                                </div>
+                            @endif
+                        </div>
+                    </td>
+                    <td>
+                        <div class="space-y-1">
+                            @if($service->type === 'pppoe')
+                                <span class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">PPPoE</span>
+                            @elseif($service->type === 'hotspot')
+                                <span class="inline-flex items-center rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">Hotspot</span>
+                            @elseif($service->type === 'dhcp')
+                                <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">DHCP</span>
+                            @else
+                                <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-700 dark:text-gray-400">{{ ucfirst($service->type) }}</span>
+                            @endif
+                            @if($service->prepaid ?? true)
+                                <span class="inline-flex items-center rounded-full bg-cyan-100 px-2.5 py-0.5 text-xs font-medium text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400">Prepaid</span>
+                            @else
+                                <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">Postpaid</span>
+                            @endif
+                        </div>
                     </td>
                     <td>
                         <span class="font-semibold text-gray-900 dark:text-white">Rp {{ number_format($service->price ?? 0, 0, ',', '.') }}</span>
