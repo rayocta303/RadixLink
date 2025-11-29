@@ -1028,6 +1028,16 @@ Content-Type: application/json
 
 ---
 
+## Kontribusi
+
+Kontribusi sangat diterima! Silakan buat pull request atau buka issue untuk bug reports dan feature requests.
+
+## Lisensi
+
+Proyek ini dilisensikan di bawah [MIT License](LICENSE).
+
+---
+
 <p align="center">
-  Made with ❤️ by Hanif Bagus Saputra for Indonesian ISPs
+  Made with ❤️ for Indonesian ISPs
 </p>
