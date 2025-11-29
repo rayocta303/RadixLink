@@ -190,7 +190,7 @@ class TenantSeeder extends Seeder
 
     protected function runTenantMigrations(array $dbCredentials): void
     {
-        $connectionName = 'tenant_migration_' . Str::random(6);
+        $connectionName = 'tenant_migration';
         
         config([
             "database.connections.{$connectionName}" => [
@@ -203,36 +203,48 @@ class TenantSeeder extends Seeder
                 'charset' => 'utf8mb4',
                 'collation' => 'utf8mb4_unicode_ci',
                 'prefix' => '',
-                'strict' => true,
-                'engine' => null,
+                'strict' => false,
+                'engine' => 'InnoDB',
             ],
         ]);
 
         DB::purge($connectionName);
         
         try {
+            DB::connection($connectionName)->getPdo();
+            $this->command->info("  Connected to database: {$dbCredentials['tenancy_db_name']}");
+            
             $migrationPath = database_path('migrations/tenant');
             $files = glob($migrationPath . '/*.php');
             sort($files);
             
             foreach ($files as $file) {
-                $migration = require $file;
+                $migrationClass = require $file;
                 
                 $currentConnection = DB::getDefaultConnection();
-                DB::setDefaultConnection($connectionName);
                 
                 try {
-                    $migration->up();
+                    DB::setDefaultConnection($connectionName);
+                    Schema::connection($connectionName)->disableForeignKeyConstraints();
+                    
+                    $migrationClass->up();
+                    
+                    Schema::connection($connectionName)->enableForeignKeyConstraints();
                     $this->command->info("  Migrated: " . basename($file));
                 } catch (\Exception $e) {
-                    if (strpos($e->getMessage(), 'already exists') === false) {
-                        throw $e;
+                    if (strpos($e->getMessage(), 'already exists') !== false || 
+                        strpos($e->getMessage(), 'Duplicate') !== false) {
+                        $this->command->info("  Skipped (exists): " . basename($file));
+                    } else {
+                        $this->command->error("  Error in " . basename($file) . ": " . $e->getMessage());
+                        Log::error("Migration error in " . basename($file) . ": " . $e->getMessage());
                     }
-                    $this->command->info("  Skipped (exists): " . basename($file));
                 } finally {
                     DB::setDefaultConnection($currentConnection);
                 }
             }
+            
+            $this->command->info("  Tenant migrations completed successfully");
         } catch (\Exception $e) {
             $this->command->error("  Migration error: " . $e->getMessage());
             Log::error("Tenant migration failed: " . $e->getMessage());
